@@ -2,38 +2,35 @@ import numpy as np
 
 #voltage = 4.5 V
 
-#ZKUSIT DRIVER NAPAJET PRIMO Z POWERBANKY
+crop_selection = 2.5
 
-
+height = 200
+width = 200
 
 path = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
-
-lower_blue = np.array([90, 60, 70])
-upper_blue = np.array([128, 255, 255])
-
-blue = [lower_blue, upper_blue]
 
 leftMot = 33
 rightMot = 35
 
-pwmMin = 30
+pwmMin = 25
 
-pwmMax = 100
+pwmMax = 70
 
 basePwm = (pwmMin + pwmMax) / 2
 
-frequency = 25
+frequency = 30
 
-pwm = 60
+threshold = 100
 
-threshold = 120
+increment = 8
 
-threshold_max = 255
+threshold_max = 200
 
-threshold_min = 40
+threshold_min = 30
 
-th_iterations = 10
+th_iterations = 15
 
-white_min=4
+white_min=2
 
 white_max=30
+

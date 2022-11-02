@@ -18,13 +18,15 @@ class Robot():
     def straight(self, speed):
         self.pwmL.ChangeDutyCycle(speed)
         self.pwmR.ChangeDutyCycle(speed)
+    def moveBoth(self, speedL, speedR):
+        self.pwmL.ChangeDutyCycle(speedL)
+        self.pwmR.ChangeDutyCycle(speedR) 
     def moveL(self, speed):
-        self.pwmL.ChangeDutyCycle(speed)
-        self.pwmR.ChangeDutyCycle(0)
-    def moveR(self, speed):
-        self.pwmL.ChangeDutyCycle(0)
         self.pwmR.ChangeDutyCycle(speed)
-        
+        self.pwmL.ChangeDutyCycle(0)
+    def moveR(self, speed):
+        self.pwmR.ChangeDutyCycle(0)
+        self.pwmL.ChangeDutyCycle(speed)
     def stop(self,time = 0):
         self.pwmL.ChangeDutyCycle(0)
         self.pwmR.ChangeDutyCycle(0)
@@ -44,16 +46,14 @@ class Servo():
         self.pwmServo.ChangeDutyCycle(0)
         
 
-def test():
+def test(time):
     
     robot = Robot(conf.leftMot, conf.rightMot)
-    
-    for i in range(100):
-        robot.move(i)
-        print(i)
-        sleep(0.1)
-    
+    while True:
+        robot.moveBoth(30, 100)
+        
 
 if __name__ == "__main__":
     test()
+
 
