@@ -2,9 +2,8 @@ import numpy as np
 import cv2 as cv
 import config as conf
 import camera_func as cfu
-from time import sleep
 
-cap = cv.VideoCapture(conf.path)
+cap = cv.VideoCapture(0)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -30,18 +29,16 @@ while True:
     if(type(frameOrig) == type(None)):
         pass
     else:
-        blurred, height, width = cfu.prep_pic(frameOrig)
-        mask_blue = cfu.obj_mask(frameOrig, conf.blue)
-        crop, area = cfu.crop_img_line(blurred, height, width)
-        ret, T_final = cfu.balance_pic(crop, area, T)
+        frame = cv.resize(frameOrig, (200, 200))
+        height, width = frame.shape[:2]
+        area = 200*200
+        ret, T_final = cfu.balance_pic(frame, area, T)
  
     try:
-        angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-        angle_obj, image_draw_obj = cfu.contours_obj(image_draw, mask_blue, height, width)
+       angle, image_draw = cfu.contours_calibrate(frame, ret, height, width)
 
     except Exception as e:    
-         print("No contours")
-         sleep(1)
+        print("No contours")
          
           
     angle = round(angle)
@@ -50,7 +47,7 @@ while True:
 
     try:
         cv.imshow("main", image_draw_obj)
-        print(angle)
+        print(size)
     except Exception as e:
         print(str(e))    
 

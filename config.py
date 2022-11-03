@@ -1,13 +1,13 @@
 import numpy as np
 
-#voltage = 4.5 V
-
-crop_selection = 2.5
+crop_selection = 1.5
 
 height = 200
 width = 200
 
 path = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
+
+blue = np.array([[80,50,50], [130,255,255]])
 
 leftMot = 33
 rightMot = 35
