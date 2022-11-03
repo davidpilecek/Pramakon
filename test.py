@@ -1,3 +1,4 @@
+#find object of specific color, get as close to it as possible and take picture of it, then aim back on the white track and drive along
 import numpy as np
 import cv2 as cv
 import config as conf
@@ -21,6 +22,8 @@ ret = None
 
 cX, cY = [0, 0]
 
+index = 0
+
 while True:
 
     direction = 0
@@ -39,12 +42,20 @@ while True:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
         angle_obj, image_draw_obj = cfu.contours_obj(image_draw, mask_blue, height, width)
 
-    except Exception as e:    
+    except Exception as e:
          print("No contours")
          sleep(1)
          
-          
+    
+    
+    
     angle = round(angle)
+
+    if(angle == 68):
+
+        path = cfu.save_pic(index, image_draw_obj)
+        print(path)
+        index += 1
 
     dev, way = cfu.deviance(angle)
 
