@@ -191,7 +191,30 @@ def contours_obj(img_draw, mask, height, width):
          cX, cY = [0, 0]
          obj_angle = 90
 
+    obj_angle = round(obj_angle)
+
     return obj_angle, img_draw
+
+
+def aim_camera(ServoX, ServoY, obj_x, obj_y):
+    while obj_x != conf.centerX:
+        if(obj_x > conf.centerX):
+            ServoX.turnL()
+        elif(obj_x < conf.centerX):
+            ServoX.turnR()
+        if (obj_x == conf.centerX):
+            break
+    while obj_y != conf.centerY:
+        if(obj_y > conf.centerY):
+            ServoY.turnL()
+        elif(obj_y < conf.centerY):
+            ServoY.turnR()
+        if (obj_y == conf.centerY):
+            break
+    ServoX.stop()
+    ServoY.stop()
+    return 0
+    
 
 def contours_calibrate(frameOrig, mask, height, width):
 

@@ -43,13 +43,13 @@ while True:
         pass
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
-        mask_blue = cfu.obj_mask(frameOrig, conf.blue)
+        mask_obj = cfu.obj_mask(frameOrig, conf.red)
         crop, area = cfu.crop_img_line(blurred, height, width)
         ret, T_final = cfu.balance_pic(crop, area, T)
  
     try:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-        angle_obj, image_draw_obj = cfu.contours_obj(image_draw, mask_blue, height, width)
+        angle_obj, image_draw_obj = cfu.contours_obj(image_draw, mask_obj, height, width)
 
     except Exception as e:
          print("No contours")
@@ -60,7 +60,7 @@ while True:
     
     angle = round(angle)
 
-    if(angle == 68):
+    if(angle_obj == 90):
 
         path = cfu.save_pic(index, image_draw_obj)
         print(path)
@@ -70,7 +70,7 @@ while True:
 
     try:
         cv.imshow("main", image_draw_obj)
-        print(angle)
+        print(angle_obj)
     except Exception as e:
         print(str(e))    
 

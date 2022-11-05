@@ -1,9 +1,11 @@
-import numpy as np
-import cv2 as cv
-import config as conf
-import camera_func as cfu
-import drive as dr
 from time import sleep
+
+import cv2 as cv
+import numpy as np
+
+import camera_func as cfu
+import config as conf
+import drive as dr
 
 robot = dr.Robot(conf.leftMot, conf.rightMot)
 
@@ -52,14 +54,11 @@ while True:
     
     if dev + conf.basePwm > conf.pwmMax:
         if way == 1:
-           
             robot.moveL(conf.basePwm)
         elif way == -1:
-            
             robot.moveR(conf.basePwm)
     else:
         cfu.steer(conf.basePwm, dev, way, robot)
-
 
     try:
         cv.imshow("window", image_draw)
@@ -69,7 +68,6 @@ while True:
     
 
     if cv.waitKey(1) == ord('q'):
-
         break
 robot.stop()
 cap.release()

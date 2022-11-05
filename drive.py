@@ -1,5 +1,7 @@
-import RPi.GPIO as GPIO
 from time import sleep
+
+import RPi.GPIO as GPIO
+
 import config as conf
 
 GPIO.setmode(GPIO.BOARD)
@@ -44,6 +46,19 @@ class Servo():
         self.pwmServo.ChangeDutyCycle(self.dutyCycle)
         sleep(1)
         self.pwmServo.ChangeDutyCycle(0)
+    def stopServo(self):
+        self.pwmServo.ChangeDutyCycle(0)
+    def turnL(self, currAngle):
+        self.currAngle = currAngle
+        self.servoAngle = currAngle - 1
+        self.dutyCycle = self.servoAngle / 36 + 5
+        self.pwmServo.ChangeDutyCycle(self.dutyCycle)
+    def turnR(self, currAngle):
+        self.currAngle = currAngle
+        self.servoAngle = currAngle + 1
+        self.dutyCycle = self.servoAngle / 36 + 5
+        self.pwmServo.ChangeDutyCycle(self.dutyCycle)
+        
         
 
 def test(time):

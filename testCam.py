@@ -1,6 +1,7 @@
-import numpy as np
 import cv2 as cv
-import camera_funct as cfu
+import numpy as np
+
+import camera_func as cfu
 
 cap = cv.VideoCapture(0)
 
