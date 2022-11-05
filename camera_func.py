@@ -1,6 +1,8 @@
-import numpy as np
 import cv2 as cv
+import numpy as np
+
 import config as conf
+
 
 def crop_img_line(img, height, width):
 
@@ -159,7 +161,7 @@ def contours_line(frameOrig, mask, height, width):
 def save_pic(index, image):
 
     
-    path = r"C:\Users\David\Pictures\opencv\testpic" + str(index) + r".jpg"
+    path = r"C:\Users\david\Pictures\cvpics\cvpic" + str(index) + r".jpg"
     cv.imwrite(path, image)
     
     return path

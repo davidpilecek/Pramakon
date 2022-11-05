@@ -1,11 +1,20 @@
 #find object of specific color, get as close to it as possible and take picture of it, then aim back on the white track and drive along
-import numpy as np
-import cv2 as cv
-import config as conf
-import camera_func as cfu
+#do NOT get off the white track, once you have to turn the camera 90 degrees to the left or right, that means it's as close
+#as possible and therefore you can take a pic of it.
+
+#create line to center of contour of red object, once it reaches 0 or 180 with regard to the center of the screen, then turn the camera 
+#to it so that the entire object is in the center of the frame and snap it
+
+
 from time import sleep
 
-cap = cv.VideoCapture(conf.path)
+import cv2 as cv
+import numpy as np
+
+import camera_func as cfu
+import config as conf
+
+cap = cv.VideoCapture(0)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
