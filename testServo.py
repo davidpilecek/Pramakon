@@ -1,14 +1,24 @@
+
+import RPi.GPIO as GPIO
+import drive as dr
+import config as conf
 from time import sleep
 
-import config as conf
-import drive as dr
+currAngle = 80
 
-ServoX = dr.Servo(conf.servoPinX)
-ServoY = dr.Servo(conf.servoPinY)
+servo = dr.Servo(conf.servoPinX)
+servo.setAngle(currAngle)
 
-ServoX.setAngle(90)
-ServoY.setAngle(90)
+sleep(1)
 
-
-
+while True:
+    print(currAngle)
+    if(currAngle >= 180):
+        servo.stopServo()
+        break
+    servo.setAngle(currAngle)
+    currAngle +=1
+    sleep(0.01)
+    
+    
 

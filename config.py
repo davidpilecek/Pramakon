@@ -19,8 +19,8 @@ red = np.array([[170, 70, 50], [180, 255, 255]])
 leftMot = 33
 rightMot = 35
 
-servoPinX = 12
-servoPinY = 32
+servoPinX = 32
+servoPinY = 12
 
 #PWM values
 pwmMin = 25

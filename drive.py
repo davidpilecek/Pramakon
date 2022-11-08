@@ -44,29 +44,16 @@ class Servo():
         self.servoAngle = servoAngle
         self.dutyCycle = self.servoAngle / 36 + 5
         self.pwmServo.ChangeDutyCycle(self.dutyCycle)
-        sleep(1)
-        self.pwmServo.ChangeDutyCycle(0)
     def stopServo(self):
+        sleep(0.2)
         self.pwmServo.ChangeDutyCycle(0)
-    def turnL(self, currAngle):
-        self.currAngle = currAngle
-        self.servoAngle = currAngle - 1
-        self.dutyCycle = self.servoAngle / 36 + 5
-        self.pwmServo.ChangeDutyCycle(self.dutyCycle)
-    def turnR(self, currAngle):
-        self.currAngle = currAngle
-        self.servoAngle = currAngle + 1
-        self.dutyCycle = self.servoAngle / 36 + 5
-        self.pwmServo.ChangeDutyCycle(self.dutyCycle)
+
         
         
 
-def test(time):
+def test():
     
-    robot = Robot(conf.leftMot, conf.rightMot)
-    while True:
-        robot.moveBoth(30, 100)
-        
+   return 0
 
 if __name__ == "__main__":
     test()
