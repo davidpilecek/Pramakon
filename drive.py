@@ -2,6 +2,8 @@ from time import sleep
 
 import RPi.GPIO as GPIO
 
+import pigpio
+
 import config as conf
 
 GPIO.setmode(GPIO.BOARD)
@@ -35,21 +37,17 @@ class Robot():
         
 class Servo():
     def __init__(self, servoPin):
-        GPIO.setwarnings(False)
+        self.pi = pigpio.pi()
         self.servoPin = servoPin
-        GPIO.setup(self.servoPin, GPIO.OUT)
-        self.pwmServo = GPIO.PWM(self.servoPin, 50)
-        self.pwmServo.start(0)
     def setAngle(self, servoAngle):
         self.servoAngle = servoAngle
-        self.dutyCycle = self.servoAngle / 36 + 5
-        self.pwmServo.ChangeDutyCycle(self.dutyCycle)
+        self.dutyCycle = (self.servoAngle/180 + 1) * 1000
+        self.pi.set_servo_pulsewidth(18, self.dutyCycle)
     def stopServo(self):
         sleep(0.2)
-        self.pwmServo.ChangeDutyCycle(0)
+        self.pi.set_servo_pulsewidth(18, 0)
 
-        
-        
+                
 
 def test():
     
