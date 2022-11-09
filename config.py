@@ -6,9 +6,8 @@ crop_selection = 1.5
 height = 200
 width = 200
 
-centerY = height / 2
-centerX = width / 2
-
+centerY = round(height / 2)
+centerX = round(width / 2)
 
 path = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
 
@@ -16,10 +15,15 @@ blue = np.array([[80,50,50], [130,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
+c_tol = 10
+
+step = 1
+
+#RPi pin config
 leftMot = 33
 rightMot = 35
 
-servoPinX = 32
+servoPinX = 18
 servoPinY = 12
 
 #PWM values

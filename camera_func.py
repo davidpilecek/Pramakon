@@ -160,7 +160,6 @@ def contours_line(frameOrig, mask, height, width):
 
 def save_pic(index, image):
 
-    
     path = r"C:\Users\david\Pictures\cvpics\cvpic" + str(index) + r".jpg"
     cv.imwrite(path, image)
     
@@ -193,7 +192,7 @@ def contours_obj(img_draw, mask, height, width):
 
     obj_angle = round(obj_angle)
 
-    return obj_angle, img_draw
+    return obj_angle, img_draw, cX, cY
 
 
 def aim_camera(ServoX, ServoY, obj_x, obj_y):

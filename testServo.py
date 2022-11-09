@@ -1,5 +1,3 @@
-
-import RPi.GPIO as GPIO
 import drive as dr
 import config as conf
 from time import sleep
@@ -18,7 +16,4 @@ while True:
         break
     servo.setAngle(currAngle)
     currAngle +=1
-    sleep(0.01)
-    
-    
-
+    sleep(0.1)

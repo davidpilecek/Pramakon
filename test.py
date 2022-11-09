@@ -10,7 +10,7 @@ from time import sleep
 
 import cv2 as cv
 import numpy as np
-
+import drive as dr
 import camera_func as cfu
 import config as conf
 
@@ -33,7 +33,13 @@ cX, cY = [0, 0]
 
 index = 0
 
+servoX = dr.Servo(conf.servoPinX)
+servoY = dr.Servo(conf.servoPinY)
+
 while True:
+
+    currAngleX = servoX.getAngle()
+    currAngleY = servoY.getAngle()
 
     direction = 0
 
@@ -49,14 +55,19 @@ while True:
  
     try:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-        angle_obj, image_draw_obj = cfu.contours_obj(image_draw, mask_obj, height, width)
+        angle_obj, image_draw_obj, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj, height, width)
 
     except Exception as e:
          print("No contours")
          sleep(1)
          
-    
-    
+    while(obj_x > conf.centerX + conf.c_tol or obj_x < conf.centerX - conf.c_tol):
+        if(obj_x > conf.centerX + conf.c_tol):
+            servoX.setAngle(currAngleX - conf.step)
+        elif(obj_x < conf.centerX - conf.c_tol):
+            servoX.setAngle(currAngleX + conf.step)
+        else:
+            break
     
     angle = round(angle)
 
