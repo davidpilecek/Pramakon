@@ -41,9 +41,13 @@ class Servo():
         self.servoPin = servoPin
     def setAngle(self, servoAngle):
         self.servoAngle = servoAngle
+        if (self.servoAngle >= 180):
+                self.servoAngle = 180
+        elif(self.servoAngle <= 0):
+                self.servoAngle = 0
         self.dutyCycle = (self.servoAngle/180 + 1) * 1000
         self.pi.set_servo_pulsewidth(self.servoPin, self.dutyCycle)
-        sleep(0.1)
+	  
     def getAngle(self):
         self.currDutyCycle = self.pi.get_servo_pulsewidth(self.servoPin)
         self.currAngle = (self.currDutyCycle / 1000 - 1) * 180

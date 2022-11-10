@@ -2,18 +2,22 @@ import drive as dr
 import config as conf
 from time import sleep
 
-currAngle = 80
+currAngle = 100
 
-servo = dr.Servo(conf.servoPinX)
-servo.setAngle(currAngle)
+servoX = dr.Servo(conf.servoPinX)
+servoY = dr.Servo(conf.servoPinY)
+servoX.setAngle(currAngle)
+servoY.setAngle(currAngle)
 
 sleep(1)
 
 while True:
     print(currAngle)
     if(currAngle >= 180):
-        servo.stopServo()
+        servoX.stopServo()
+        servoY.stopServo()
         break
-    servo.setAngle(currAngle)
-    currAngle +=1
-    sleep(0.1)
+    servoX.setAngle(currAngle)
+    servoY.setAngle(currAngle)
+    sleep(0.01)
+    currAngle +=conf.step

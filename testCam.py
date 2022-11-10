@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-
+import config as conf
 import camera_func as cfu
 
 cap = cv.VideoCapture(0)
