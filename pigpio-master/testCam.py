@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-import config as conf
+
 import camera_func as cfu
 
 cap = cv.VideoCapture(0)
@@ -16,12 +16,12 @@ while True:
     if(type(frame) == type(None) or _ == False):
         pass
 
-    try:
-        frameShow, height, width = cfu.prep_pic(frame)      
+    frameShow, height, width = cfu.prep_pic(frame)
+
+
+    try:      
         cv.imshow("window", frameShow)
     except Exception as e:
-        cap.release()
-        cap.open(0)
         print(str(e))
        
         

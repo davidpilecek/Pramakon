@@ -14,7 +14,7 @@ import drive as dr
 import camera_func as cfu
 import config as conf
 
-cap = cv.VideoCapture(conf.pathPi)
+cap = cv.VideoCapture(0)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -27,20 +27,18 @@ kernel = np.ones((3,3),np.uint8)
 
 angle = 0
 
-angle_obj = 0
-
-obj_x = 0
-obj_y = 0
-
 ret = None
 
 cX, cY = [0, 0]
 
 index = 0
 
+angle_obj = []
+
+arr_empty = np.zeros([conf.height, conf.width], dtype=int)
+
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
-
 
 while True:
 
@@ -61,15 +59,17 @@ while True:
  
     try:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-
+        
     except Exception as e:
          print("No line contours")
          sleep(1)
-    try:
-          angle_obj. image_draw_obj, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj, height, width)
-    except Exception as e:
-          print("No object contours")
-          sleep(1)
+    
+    if(not np.array_equal(mask_obj, arr_empty)):
+        angle_obj, image_draw_obj, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj, height, width)
+    else:
+        angle_obj, image_draw_obj, obj_x, obj_y = [0, 0, 0, 0]
+        print("No object contour")
+    
         
     while(obj_x > conf.centerX + conf.c_tol or obj_x < conf.centerX - conf.c_tol):
         if(obj_x > conf.centerX + conf.c_tol):
@@ -78,8 +78,6 @@ while True:
             servoX.setAngle(currAngleX + conf.step)
         else:
             break
-    
-    angle = round(angle)
 
     if(angle_obj == 90):
 
@@ -99,4 +97,3 @@ while True:
         break
 cap.release()
 cv.destroyAllWindows()
-

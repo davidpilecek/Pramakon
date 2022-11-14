@@ -153,6 +153,8 @@ def contours_line(frameOrig, mask, height, width):
     
     average_angle = (ang_vector*1/3 + angle*2/3)
 
+    average_angle = round(average_angle)
+
     cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
     return average_angle, image_draw
@@ -167,6 +169,7 @@ def save_pic(index, image):
 
 def contours_obj(img_draw, mask, height, width):
 
+    cX, cY = [0, 0]
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
     contour = max(contours, key = cv.contourArea, default=0)

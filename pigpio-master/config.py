@@ -9,10 +9,9 @@ width = 200
 centerY = round(height / 2)
 centerX = round(width / 2)
 
-pathPC = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
-pathPi = r"/home/pi/Desktop/video.mp4"
+path = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
 
-blue = np.array([[80,50,50], [130,255,255]])
+blue = np.array([[85,80,100], [130,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
