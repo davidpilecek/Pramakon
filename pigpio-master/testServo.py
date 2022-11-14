@@ -16,4 +16,4 @@ while True:
         break
     servo.setAngle(currAngle)
     currAngle +=1
-    sleep(0.1)
+    sleep(0.005)

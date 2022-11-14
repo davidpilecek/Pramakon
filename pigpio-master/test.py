@@ -14,7 +14,7 @@ import drive as dr
 import camera_func as cfu
 import config as conf
 
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(conf.pathPi)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -40,6 +40,9 @@ arr_empty = np.zeros([conf.height, conf.width], dtype=int)
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
 
+servoX.setAngle(140)
+servoY.setAngle(140)
+sleep(0.5)
 while True:
 
     currAngleX = servoX.getAngle()
