@@ -33,6 +33,8 @@ cX, cY = [0, 0]
 
 index = 0
 
+obj_centered = False
+
 angle_obj = []
 
 arr_empty = np.zeros([conf.height, conf.width], dtype=int)
@@ -73,14 +75,18 @@ while True:
         angle_obj, image_draw_obj, obj_x, obj_y = [0, 0, 0, 0]
         print("No object contour")
 
+
+#aim camera
     if(obj_x <= conf.tol or obj_x >= width - conf.tol):
-        cfu.aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
-
-    if(angle_obj == 90):
-
-        path = cfu.save_pic(index, image_draw_obj)
-        print(path)
-        index += 1
+        obj_centered = False
+        while not obj_centered:
+            cfu.aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
+            if(angle_obj == 90):
+                obj_centered = True
+                path = cfu.save_pic(index, image_draw_obj)
+                print(path)
+                index += 1
+                break
 
     dev, way = cfu.deviance(angle)
 
