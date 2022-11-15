@@ -3,8 +3,8 @@ import numpy as np
 crop_selection = 1.5
 
 #height and width of image
-height = 200
-width = 200
+height = 400
+width = 400
 
 centerY = round(height / 2)
 centerX = round(width / 2)
@@ -19,7 +19,7 @@ blue = np.array([[85,80,100], [130,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
-tol = 10
+tol = 50
 
 step = 1
 
@@ -44,13 +44,3 @@ threshold_min = 30
 th_iterations = 15
 white_min=2
 white_max=30
-
-#size of 10 mm in pixels
-size_of_cm = 100
-
-#approximate size of detected object in mm [x, y]
-size_of_obj = [100, 100]
-
-#desired approximate distance of robot from detected object in mm
-distance_from_obj = 500
-

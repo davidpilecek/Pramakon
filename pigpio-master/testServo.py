@@ -2,7 +2,7 @@ import drive as dr
 import config as conf
 from time import sleep
 
-currAngle = 80
+currAngle = 60
 
 servoX = dr.Servo(conf.servoPinX)
 servoX.setAngle(currAngle)
@@ -20,4 +20,4 @@ while True:
     servoX.setAngle(currAngle)
     servoY.setAngle(currAngle)
     currAngle +=1
-    sleep(0.005)
+    sleep(0.02)

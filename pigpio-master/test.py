@@ -1,6 +1,8 @@
-#find object of specific color, get as close to it as possible and take picture of it, then aim back on the white track and drive along
-#do NOT get off the white track, once you have to turn the camera 90 degrees to the left or right, that means it's as close
-#as possible and therefore you can take a pic of it.
+#find object of specific color, get as close to it as possible and take 
+#picture of it, then aim back on the white track and drive along do NOT 
+#get off the white track, once you have to turn the camera 90 degrees to 
+#the left or right, that means it's as close as possible and therefore 
+#you can take a pic of it.
 
 #create line to center of contour of red object, once it reaches 0 or 180 with regard to the center of the screen, then turn the camera 
 #to it so that the entire object is in the center of the frame and snap it
@@ -14,7 +16,7 @@ import drive as dr
 import camera_func as cfu
 import config as conf
 
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(conf.pathPi)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -22,8 +24,6 @@ if not cap.isOpened():
 T = conf.threshold
 
 frame_draw = []
-
-kernel = np.ones((3,3),np.uint8)
 
 angle = 0
 
@@ -33,7 +33,7 @@ cX, cY = [0, 0]
 
 index = 0
 
-obj_centered = False
+go_aim = False
 
 angle_obj = []
 
@@ -78,21 +78,21 @@ while True:
 
 #aim camera
     if(obj_x <= conf.tol or obj_x >= width - conf.tol):
-        obj_centered = False
-        while not obj_centered:
-            cfu.aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
-            if(angle_obj == 90):
-                obj_centered = True
-                path = cfu.save_pic(index, image_draw_obj)
-                print(path)
-                index += 1
-                break
+        go_aim = True    
+        print("at border")
+    if(go_aim):
+        cfu.aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
+        if(obj_x == 90):
+            path = cfu.save_pic(index, image_draw_obj)
+            print(path)
+            index += 1
+            go_aim = False
+
 
     dev, way = cfu.deviance(angle)
 
     try:
         cv.imshow("main", image_draw_obj)
-        print(angle_obj)
     except Exception as e:
         print(str(e))
 

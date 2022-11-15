@@ -29,7 +29,7 @@ def crop_img_line(img, height, width):
     return masked_image, area
 
 def prep_pic(src):
-    frame = cv.resize(src, (200, 200))
+    frame = cv.resize(src, (conf.height, conf.width))
     height, width = frame.shape[:2]
 
     blurred = cv.GaussianBlur(frame, (15, 15), 0)
@@ -102,7 +102,7 @@ def steer(basePwm, dev, way, robot):
 
 def contours_line(frameOrig, mask, height, width):
 
-    image_draw = cv.resize(frameOrig, [200, 200])
+    image_draw = cv.resize(frameOrig, [height, width])
 
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
@@ -227,7 +227,7 @@ def contours_calibrate(frameOrig, mask, height, width):
 
 def obj_mask(src, color):
 
-    frame = cv.resize(src, (200, 200))
+    frame = cv.resize(src, (conf.height, conf.width))
 
     blurred = cv.GaussianBlur(frame, (15, 15), 0)
 
