@@ -162,7 +162,8 @@ def contours_line(frameOrig, mask, height, width):
 
 def save_pic(index, image):
 
-    path = r"C:\Users\david\Pictures\cvpics\cvpic" + str(index) + r".jpg"
+    path = conf.path_pic + str(index) + r".jpg"
+   
     cv.imwrite(path, image)
     
     return path
@@ -198,25 +199,15 @@ def contours_obj(img_draw, mask, height, width):
     return obj_angle, img_draw, cX, cY
 
 
-def aim_camera(ServoX, ServoY, obj_x, obj_y):
-    while obj_x != conf.centerX:
-        if(obj_x > conf.centerX):
-            ServoX.turnL()
-        elif(obj_x < conf.centerX):
-            ServoX.turnR()
-        if (obj_x == conf.centerX):
-            break
-    while obj_y != conf.centerY:
-        if(obj_y > conf.centerY):
-            ServoY.turnL()
-        elif(obj_y < conf.centerY):
-            ServoY.turnR()
-        if (obj_y == conf.centerY):
-            break
-    ServoX.stop()
-    ServoY.stop()
-    return 0
-    
+def aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
+    if(obj_x > conf.centerX + conf.tol):
+          servoX.setAngle(currAngleX - conf.step)
+    elif(obj_x < conf.centerX - conf.tol):
+          servoX.setAngle(currAngleX + conf.step)
+    if(obj_y > conf.centerY + conf.tol):
+          servoY.setAngle(currAngleY - conf.step)
+    elif(obj_y < conf.centerY - conf.tol):
+          servoY.setAngle(currAngleY + conf.step)
 
 def contours_calibrate(frameOrig, mask, height, width):
 

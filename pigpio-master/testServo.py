@@ -4,16 +4,20 @@ from time import sleep
 
 currAngle = 80
 
-servo = dr.Servo(conf.servoPinX)
-servo.setAngle(currAngle)
+servoX = dr.Servo(conf.servoPinX)
+servoX.setAngle(currAngle)
+servoY = dr.Servo(conf.servoPinY)
+servoY.setAngle(currAngle)
 
 sleep(1)
 
 while True:
     print(currAngle)
     if(currAngle >= 180):
-        servo.stopServo()
+        servoX.stopServo()
+        servoY.stopServo()
         break
-    servo.setAngle(currAngle)
+    servoX.setAngle(currAngle)
+    servoY.setAngle(currAngle)
     currAngle +=1
     sleep(0.005)

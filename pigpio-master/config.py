@@ -9,13 +9,17 @@ width = 200
 centerY = round(height / 2)
 centerX = round(width / 2)
 
-path = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
+pathPC = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
+pathPi = r"/home/pi/Desktop/video.mp4"
+
+path_pic = r"/home/pi/Desktop/cvPics/"
+
 
 blue = np.array([[85,80,100], [130,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
-c_tol = 10
+tol = 10
 
 step = 1
 

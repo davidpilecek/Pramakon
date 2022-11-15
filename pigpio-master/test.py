@@ -14,7 +14,7 @@ import drive as dr
 import camera_func as cfu
 import config as conf
 
-cap = cv.VideoCapture(conf.pathPi)
+cap = cv.VideoCapture(0)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
@@ -72,15 +72,9 @@ while True:
     else:
         angle_obj, image_draw_obj, obj_x, obj_y = [0, 0, 0, 0]
         print("No object contour")
-    
-        
-    while(obj_x > conf.centerX + conf.c_tol or obj_x < conf.centerX - conf.c_tol):
-        if(obj_x > conf.centerX + conf.c_tol):
-            servoX.setAngle(currAngleX - conf.step)
-        elif(obj_x < conf.centerX - conf.c_tol):
-            servoX.setAngle(currAngleX + conf.step)
-        else:
-            break
+
+    if(obj_x <= conf.tol or obj_x >= width - conf.tol):
+        cfu.aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
 
     if(angle_obj == 90):
 
@@ -94,7 +88,7 @@ while True:
         cv.imshow("main", image_draw_obj)
         print(angle_obj)
     except Exception as e:
-        print(str(e))    
+        print(str(e))
 
     if cv.waitKey(1) == ord('q'):
         break
