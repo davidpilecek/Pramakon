@@ -6,7 +6,6 @@ import config as conf
 
 class Robot():
     def __init__(self, leftMot, rightMot):
-
         self.pi = pigpio.pi()
         self.leftMot = leftMot
         self.rightMot = rightMot
@@ -58,15 +57,11 @@ class Servo():
 def test(robot):
     for i in range(255):
         robot.straight(i)
-    return i
-
-   
-   
-
-if __name__ == "__main__":
-    robot = Robot(conf.leftMot, conf.rightMot)
-    curr_pwm = test(robot)
-    print(curr_pwm)
-
+        sleep(0.1)
+        print(i)
+    robot.stop()
     
-
+if __name__ == "__main__":
+    pi = pigpio.pi()
+    robot = Robot(conf.leftMot, conf.rightMot)
+    test(robot)
