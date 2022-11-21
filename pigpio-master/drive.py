@@ -1,39 +1,35 @@
 from time import sleep
 
-import RPi.GPIO as GPIO
-
 import pigpio
 
 import config as conf
 
-GPIO.setmode(GPIO.BOARD)
-
 class Robot():
     def __init__(self, leftMot, rightMot):
-        GPIO.setwarnings(False)
+
+        self.pi = pigpio.pi()
         self.leftMot = leftMot
         self.rightMot = rightMot
-        GPIO.setup(leftMot,GPIO.OUT)
-        GPIO.setup(rightMot,GPIO.OUT)
-        self.pwmL = GPIO.PWM(self.leftMot,conf.frequency)
-        self.pwmL.start(0)
-        self.pwmR = GPIO.PWM(self.rightMot,conf.frequency)
-        self.pwmR.start(0)
+        self.pi.set_mode(self.leftMot, pigpio.OUTPUT)
+        self.pi.set_mode(self.rightMot, pigpio.OUTPUT)
+        self.pi.set_PWM_frequency(self.leftMot, conf.frequency)
+        self.pi.set_PWM_frequency(self.rightMot, conf.frequency)
+
     def straight(self, speed):
-        self.pwmL.ChangeDutyCycle(speed)
-        self.pwmR.ChangeDutyCycle(speed)
+        self.pi.set_PWM_dutycycle(self.leftMot, speed)
+        self.pi.set_PWM_dutycycle(self.rightMot, speed)
     def moveBoth(self, speedL, speedR):
-        self.pwmL.ChangeDutyCycle(speedL)
-        self.pwmR.ChangeDutyCycle(speedR) 
+        self.pi.set_PWM_dutycycle(self.leftMot, speedL)
+        self.pi.set_PWM_dutycycle(self.rightMot, speedR)
     def moveL(self, speed):
-        self.pwmR.ChangeDutyCycle(speed)
-        self.pwmL.ChangeDutyCycle(0)
+        self.pi.set_PWM_dutycycle(self.leftMot, speed)
+        self.pi.set_PWM_dutycycle(self.rightMot, 0)
     def moveR(self, speed):
-        self.pwmR.ChangeDutyCycle(0)
-        self.pwmL.ChangeDutyCycle(speed)
-    def stop(self,time = 0):
-        self.pwmL.ChangeDutyCycle(0)
-        self.pwmR.ChangeDutyCycle(0)
+        self.pi.set_PWM_dutycycle(self.leftMot, 0)
+        self.pi.set_PWM_dutycycle(self.rightMot, speed)
+    def stop(self):
+        self.pi.set_PWM_dutycycle(self.leftMot, 0)
+        self.pi.set_PWM_dutycycle(self.rightMot, 0)
         
 class Servo():
     def __init__(self, servoPin):
@@ -59,18 +55,18 @@ class Servo():
 
                 
 
-def test(ServoX, ServoY):
-   ServoX.setAngle(120)
-   ServoY.setAngle(120)
-   angx = ServoX.getAngle()
-   angy = ServoY.getAngle()
+def test(robot):
+    for i in range(255):
+        robot.straight(i)
+    return i
+
    
    
-   return angx, angy
 
 if __name__ == "__main__":
-    ServoX = Servo(conf.servoPinX)
-    ServoY = Servo(conf.servoPinY)
-    angx, angy = test(ServoX, ServoY)
-    print(angx, angy)
+    robot = Robot(conf.leftMot, conf.rightMot)
+    curr_pwm = test(robot)
+    print(curr_pwm)
+
+    
 
