@@ -13,7 +13,8 @@ class Robot():
         self.pi.set_mode(self.rightMot, pigpio.OUTPUT)
         self.pi.set_PWM_frequency(self.leftMot, conf.frequency)
         self.pi.set_PWM_frequency(self.rightMot, conf.frequency)
-
+        self.pi.set_PWM_range(self.leftMot, 100)
+        self.pi.set_PWM_range(self.rightMot, 100)
     def straight(self, speed):
         self.pi.set_PWM_dutycycle(self.leftMot, speed)
         self.pi.set_PWM_dutycycle(self.rightMot, speed)
@@ -55,9 +56,9 @@ class Servo():
                 
 
 def test(robot):
-    for i in range(255):
+    for i in range(100):
         robot.straight(i)
-        sleep(0.1)
+        sleep(0.05)
         print(i)
     robot.stop()
     

@@ -26,16 +26,14 @@ step = 1
 #RPi pin config
 leftMot = 13
 rightMot = 19
-
-
 servoPinX = 18
 servoPinY = 12
 
 #PWM values
-pwmMin = 255*0.25
-pwmMax = 255*0.7
+pwmMin = 25
+pwmMax = 70
 basePwm = (pwmMin + pwmMax) / 2
-frequency = 40
+frequency = 25
 
 #values for brightness balancing
 increment = 8
