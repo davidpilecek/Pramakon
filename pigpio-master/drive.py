@@ -53,16 +53,11 @@ class Servo():
         sleep(0.2)
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
-                
-
-def test(robot):
-    for i in range(100):
-        robot.straight(i)
-        sleep(0.05)
-        print(i)
-    robot.stop()
-    
+                   
 if __name__ == "__main__":
-    pi = pigpio.pi()
-    robot = Robot(conf.leftMot, conf.rightMot)
-    test(robot)
+         servoX = Servo(conf.servoPinX)
+         servoY = Servo(conf.servoPinY)
+         servoX.setAngle(130)
+         servoY.setAngle(110)
+         servoX.stopServo()
+         servoY.stopServo()

@@ -1,10 +1,10 @@
 import numpy as np
 
-crop_selection = 1.5
+crop_selection = 1.8
 
 #height and width of image
-height = 400
-width = 400
+height = 200
+width = 200
 
 centerY = round(height / 2)
 centerX = round(width / 2)
@@ -24,22 +24,22 @@ tol = 50
 step = 1
 
 #RPi pin config
-leftMot = 13
-rightMot = 19
+leftMot = 19
+rightMot = 13
 servoPinX = 18
 servoPinY = 12
 
 #PWM values
-pwmMin = 25
+pwmMin = 30
 pwmMax = 70
 basePwm = (pwmMin + pwmMax) / 2
-frequency = 25
+frequency = 40
 
 #values for brightness balancing
 increment = 8
-threshold = 100
-threshold_max = 200
-threshold_min = 30
+threshold = 150
+threshold_max = 250
+threshold_min = 50
 th_iterations = 15
-white_min=2
-white_max=30
+white_min=5
+white_max=50
