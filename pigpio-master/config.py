@@ -1,10 +1,10 @@
 import numpy as np
 
-crop_selection = 1.8
+crop_selection = 2
 
 #height and width of image
-height = 200
-width = 200
+height = 600
+width = 600
 
 centerY = round(height / 2)
 centerX = round(width / 2)
@@ -37,9 +37,9 @@ frequency = 40
 
 #values for brightness balancing
 increment = 8
-threshold = 150
+threshold = 120
 threshold_max = 250
 threshold_min = 50
 th_iterations = 15
-white_min=5
+white_min=20
 white_max=50
