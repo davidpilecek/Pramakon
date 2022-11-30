@@ -1,8 +1,6 @@
-#find object of specific color, get as close to it as possible and take 
-#picture of it, then aim back on the white track and drive along do NOT 
-#get off the white track, once you have to turn the camera 90 degrees to 
-#the left or right, that means it's as close as possible and therefore 
-#you can take a pic of it.
+#find object of specific color, get as close to it as possible and take picture of it, then aim back on the white track and drive along
+#do NOT get off the white track, once you have to turn the camera 90 degrees to the left or right, that means it's as close
+#as possible and therefore you can take a pic of it.
 
 #create line to center of contour of red object, once it reaches 0 or 180 with regard to the center of the screen, then turn the camera 
 #to it so that the entire object is in the center of the frame and snap it
@@ -33,13 +31,6 @@ cX, cY = [0, 0]
 
 index = 0
 
-go_aim = False
-
-angle_obj = []
-
-arr_empty = np.zeros([conf.height, conf.width], dtype=int)
-
-sleep(0.5)
 while True:
 
     direction = 0
@@ -50,29 +41,24 @@ while True:
         pass
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
-        mask_obj, hsvImg = cfu.obj_mask(frameOrig, conf.blue)
-        crop, area = cfu.crop_img_line(blurred, height, width)
-        ret, T_final = cfu.balance_pic(crop, area, T)
+
+        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue)
  
     try:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-        
+
     except Exception as e:
-         print("No line contours")
+         print("No contours")
          sleep(1)
-    
-    if(not np.array_equal(mask_obj, arr_empty)):
-        angle_obj, image_draw_obj, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj, height, width)
-    else:
-        angle_obj, image_draw_obj, obj_x, obj_y = [0, 0, 0, 0]
-        print("No object contour")
+    angle = round(angle)
 
     dev, way = cfu.deviance(angle)
 
     try:
-        cv.imshow("main", hsvImg)
+        cv.imshow("main", image_draw)
+        cv.imshow("orig", blurred)
     except Exception as e:
-        print(str(e))
+        print(str(e))    
 
     if cv.waitKey(1) == ord('q'):
         break

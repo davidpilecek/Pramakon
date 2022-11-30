@@ -1,4 +1,5 @@
 import numpy as np
+import cv2 as cv
 
 crop_selection = 2
 
@@ -15,7 +16,7 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 path_pic = r"/home/pi/Desktop/cvPics/"
 
 
-blue = np.array([[85,80,100], [130,255,255]])
+blue = np.array([[80,20,100], [135,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
@@ -43,3 +44,15 @@ threshold_min = 50
 th_iterations = 15
 white_min=20
 white_max=50
+
+
+if __name__ == "__main__":
+    while True:
+        image = np.zeros((500, 500, 3), np.uint8)
+        image[:] = (80,20,133)
+        im_conv = cv.cvtColor(image, cv.COLOR_HSV2BGR)
+
+        #cv.imshow("image", image)
+        cv.imshow("cvt", im_conv)
+        if cv.waitKey(1) == ord('q'):
+            break

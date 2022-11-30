@@ -26,13 +26,41 @@ def crop_img_line(img, height, width):
     #return image with other area than AOI non-reactive to contour seeking algorithm
     masked_image = cv.bitwise_and(img, mask)
 
-    return masked_image, area
+    return mask, area
+
+def crop_img_line_color(img, height, width, color):
+
+    height_1 = height/conf.crop_selection
+
+    vertices = [(0, height_1), (0, height),(width , height), (width, height_1)]
+    vertices = np.array([vertices], np.int32)
+
+    #create pure black frame size of image
+    mask_black = np.zeros_like(img)
+
+    match_mask_color = [255,255,255]
+
+    area = round((height - height_1) * width)
+
+    img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+
+    #create pure white frame in area of interest
+    cv.fillPoly(mask_black, vertices, match_mask_color)
+
+    #return image with other area than AOI non-reactive to contour seeking algorithm
+    masked_image = cv.bitwise_and(img, mask_black)
+
+    
+    mask = cv.inRange(masked_image, color[0], color[1])
+
+
+    return mask, area
 
 def prep_pic(src):
     frame = cv.resize(src, (conf.height, conf.width))
     height, width = frame.shape[:2]
 
-    blurred = cv.GaussianBlur(frame, (15, 15), 0)
+    blurred = cv.GaussianBlur(frame, (7, 7), 0)
 
     return blurred, height, width
 
@@ -151,7 +179,7 @@ def contours_line(frameOrig, mask, height, width):
          angle = 90
 
     
-    average_angle = (ang_vector*1/3 + angle*2/3)
+    average_angle = (ang_vector*0.5 + angle*0.5)
 
     average_angle = round(average_angle)
 
@@ -235,4 +263,4 @@ def obj_mask(src, color):
 
     mask = cv.inRange(hsvImg, color[0], color[1])
 
-    return mask
+    return mask, hsvImg
