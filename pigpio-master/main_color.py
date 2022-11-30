@@ -4,8 +4,6 @@
 
 #create line to center of contour of red object, once it reaches 0 or 180 with regard to the center of the screen, then turn the camera 
 #to it so that the entire object is in the center of the frame and snap it
-
-
 from time import sleep
 
 import cv2 as cv
@@ -13,6 +11,16 @@ import numpy as np
 
 import camera_func as cfu
 import config as conf
+import drive as dr
+
+robot = dr.Robot(conf.leftMot, conf.rightMot)
+servoX = dr.Servo(conf.servoPinX)
+servoY = dr.Servo(conf.servoPinY)
+
+servoX.setAngle(110)
+servoY.setAngle(110)
+servoX.stopServo()
+servoY.stopServo()
 
 cap = cv.VideoCapture(0)
 
@@ -53,10 +61,17 @@ while True:
     angle = round(angle)
 
     dev, way = cfu.deviance(angle)
+    if dev + conf.basePwm > conf.pwmMax:
+        if way == 1:
+            robot.moveL(conf.basePwm)
+        elif way == -1:
+            robot.moveR(conf.basePwm)
+    else:
+        cfu.steer(conf.basePwm, dev, way, robot)
+
 
     try:
         cv.imshow("main", image_draw)
-        cv.imshow("orig", blurred)
     except Exception as e:
         print(str(e))    
 
