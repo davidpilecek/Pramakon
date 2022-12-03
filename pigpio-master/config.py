@@ -1,7 +1,15 @@
 import numpy as np
 import cv2 as cv
 
-crop_selection = 2
+perc_frame = 50
+
+tries_to_find = 5
+
+#PWM values
+pwmMin = 30
+pwmMax = 70
+basePwm = (pwmMin + pwmMax) / 2
+frequency = 40
 
 #height and width of image
 height = 600
@@ -15,12 +23,13 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 
 path_pic = r"/home/pi/Desktop/cvPics/"
 
-
 blue = np.array([[80,20,100], [135,255,255]])
 
 red = np.array([[170, 70, 50], [180, 255, 255]])
 
 tol = 50
+
+ang_tol = 10
 
 step = 1
 
@@ -29,12 +38,6 @@ leftMot = 19
 rightMot = 13
 servoPinX = 18
 servoPinY = 12
-
-#PWM values
-pwmMin = 30
-pwmMax = 70
-basePwm = (pwmMin + pwmMax) / 2
-frequency = 40
 
 #values for brightness balancing
 increment = 8
@@ -45,6 +48,8 @@ th_iterations = 15
 white_min=20
 white_max=50
 
+
+crop_selection = 100/perc_frame
 
 if __name__ == "__main__":
     while True:

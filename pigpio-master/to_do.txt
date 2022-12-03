@@ -1,0 +1,10 @@
+1)find object of specific color and take picture of it
+2)improve contour seeking with camera
+3)use AI tool to identify the object
+
+find object of specific color, get as close to it as possible and take picture of it, then aim back on the track and drive along
+do NOT get off the track, once you have to turn the camera 90 degrees to the left or right, that means it's as close
+as possible and therefore you can take a pic of it.
+
+once the turn is so sharp it has to utilize only one wheel, tilt camera to that direction for a while, then return back
+

@@ -1,20 +1,21 @@
-#find object of specific color, get as close to it as possible and take 
-#picture of it, then aim back on the white track and drive along do NOT 
-#get off the white track, once you have to turn the camera 90 degrees to 
-#the left or right, that means it's as close as possible and therefore 
-#you can take a pic of it.
-
-#create line to center of contour of red object, once it reaches 0 or 180 with regard to the center of the screen, then turn the camera 
-#to it so that the entire object is in the center of the frame and snap it
-
 
 from time import sleep
-
+import time
 import cv2 as cv
 import numpy as np
 
 import camera_func as cfu
 import config as conf
+import drive as dr
+
+robot = dr.Robot(conf.leftMot, conf.rightMot)
+servoX = dr.Servo(conf.servoPinX)
+servoY = dr.Servo(conf.servoPinY)
+
+servoX.setAngle(110)
+servoY.setAngle(110)
+servoX.stopServo()
+servoY.stopServo()
 
 cap = cv.VideoCapture(0)
 
@@ -33,16 +34,11 @@ cX, cY = [0, 0]
 
 index = 0
 
-go_aim = False
+last_time = 0
 
-angle_obj = []
-
-arr_empty = np.zeros([conf.height, conf.width], dtype=int)
-
-sleep(0.5)
 while True:
-
-    direction = 0
+    currAngleX = servoX.getAngle()
+    currAngleY = servoY.getAngle()
 
     _, frameOrig = cap.read()
 
@@ -50,29 +46,58 @@ while True:
         pass
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
-        mask_obj, hsvImg = cfu.obj_mask(frameOrig, conf.blue)
-        crop, area = cfu.crop_img_line(blurred, height, width)
-        ret, T_final = cfu.balance_pic(crop, area, T)
+        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue)
+        mask_obj = cfu.obj_mask(blurred, conf.red)
+               
  
     try:
-        angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-        
+        angle, img_draw = cfu.contours_line(img_draw, ret, height, width)
     except Exception as e:
-         print("No line contours")
-         sleep(1)
-    
-    if(not np.array_equal(mask_obj, arr_empty)):
-        angle_obj, image_draw_obj, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj, height, width)
-    else:
-        angle_obj, image_draw_obj, obj_x, obj_y = [0, 0, 0, 0]
+        robot.stop()
+        print("No contour")
+    try:
+        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(frameOrig, mask_obj)
+    except Exception as e:
         print("No object contour")
+
+    if(angle > 90 + conf.ang_tol):
+          servoX.setAngle(currAngleX - conf.step)
+    elif(angle < 90 - conf.ang_tol):
+          servoX.setAngle(currAngleX + conf.step)
 
     dev, way = cfu.deviance(angle)
 
+    if dev + conf.basePwm > conf.pwmMax:
+        if way == 1:
+            robot.moveL(conf.basePwm)
+            servoX.setAngle(currAngleX + 20)
+            last_time = time.time()
+            if(time.time() - last_time >= 0.2):
+                servoX.setAngle(currAngleX - 20)
+                last_time = time.time()
+        elif way == -1:
+            robot.moveR(conf.basePwm)
+            servoX.setAngle(currAngleX - 20)
+            last_time = time.time()
+            if(time.time() - last_time >= 0.5):
+                servoX.setAngle(currAngleX + 20)
+                last_time = time.time()
+
+    else:
+        cfu.steer(conf.basePwm, dev, way, robot)
+
+    # if(condition to take pic of object):
+    #     robot.stop()
+    #     cfu.aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
+    #     if(obj_x == conf.centerX and obj_y == conf.centerY):
+    #         cfu.save_pic(index, img_draw)
+    #     servoX.setAngle(110)
+    #     servoY.setAngle(110)
+
     try:
-        cv.imshow("main", hsvImg)
+        cv.imshow("main", img_draw)
     except Exception as e:
-        print(str(e))
+        print(str(e))    
 
     if cv.waitKey(1) == ord('q'):
         break

@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 
 import config as conf
-
+import time
 
 def crop_img_line(img, height, width):
 
@@ -32,7 +32,7 @@ def crop_img_line_color(img, height, width, color):
 
     height_1 = height/conf.crop_selection
 
-    vertices = [(0, height_1), (0, height),(width , height), (width, height_1)]
+    vertices = [(0, height_1), (0, height),(width, height), (width, height_1)]
     vertices = np.array([vertices], np.int32)
 
     #create pure black frame size of image
@@ -49,10 +49,8 @@ def crop_img_line_color(img, height, width, color):
 
     #return image with other area than AOI non-reactive to contour seeking algorithm
     masked_image = cv.bitwise_and(img, mask_black)
-
     
     mask = cv.inRange(masked_image, color[0], color[1])
-
 
     return mask, area
 
@@ -127,6 +125,7 @@ def steer(basePwm, dev, way, robot):
     else:
         #print("moving straight")
         robot.straight(basePwm)
+    return way
 
 def contours_line(frameOrig, mask, height, width):
 
@@ -170,16 +169,16 @@ def contours_line(frameOrig, mask, height, width):
     cv.circle(image_draw, (cX, cY), 10, (255, 255, 0), -1)
 
     if cX > int(width / 2):
-             angle = 180 - np.degrees(np.arctan((height - cY) / (cX - int(width / 2))))
+             x_pos = 180 - np.degrees(np.arctan((height - cY) / (cX - int(width / 2))))
 
     elif cX < int(width / 2):
-             angle = np.degrees(np.arctan((height - cY) / (int(width / 2) - cX )))
+             x_pos = np.degrees(np.arctan((height - cY) / (int(width / 2) - cX )))
     else:
          cX, cY = [0, 0]
-         angle = 90
+         x_pos = 90
 
     
-    average_angle = (ang_vector*0.5 + angle*0.5)
+    average_angle = (ang_vector*0.5 + x_pos*0.5)
 
     average_angle = round(average_angle)
 
@@ -203,8 +202,9 @@ def contours_obj(img_draw, mask, height, width):
 
     contour = max(contours, key = cv.contourArea, default=0)
 
-    cv.drawContours(img_draw, contour, -1, (0, 0, 255), 5)
-    
+    x,y,w,h = cv.boundingRect(contour)
+    cv.rectangle(img_draw ,(x,y),(x+w,y+h),(0,0,255),5)
+
     if len(contours)>0:
         M = cv.moments(contour)
         if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
@@ -227,7 +227,7 @@ def contours_obj(img_draw, mask, height, width):
     return obj_angle, img_draw, cX, cY
 
 
-def aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
+def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
     if(obj_x > conf.centerX + conf.tol):
           servoX.setAngle(currAngleX - conf.step)
     elif(obj_x < conf.centerX - conf.tol):
@@ -236,22 +236,6 @@ def aim_camera(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
           servoY.setAngle(currAngleY - conf.step)
     elif(obj_y < conf.centerY - conf.tol):
           servoY.setAngle(currAngleY + conf.step)
-
-def contours_calibrate(frameOrig, mask, height, width):
-
-    image_draw = cv.resize(frameOrig, [height, width])
-
-    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
-
-    contour = max(contours, key = cv.contourArea, default=0)
-
-    rect = cv.minAreaRect(contour)
-    size = np.array(rect[1])
-    box = cv.boxPoints(rect)
-    box = np.int0(box)
-    cv.drawContours(image_draw, [box], 0, (0, 255, 0), 5)
-
-    return image_draw, size
 
 def obj_mask(src, color):
 
@@ -264,3 +248,14 @@ def obj_mask(src, color):
     mask = cv.inRange(hsvImg, color[0], color[1])
 
     return mask, hsvImg
+
+
+# def find_line(last_dir, servoX, servoY, currAngleX, currAngleY):
+#     print("Trying to find line")
+#     i = 0
+#     while i <= conf.tries_to_find:
+#         servoY.setAngle(currAngleY + 10)
+#         currAngleY = servoY.getAngle()
+#         if(last_dir <= 0):
+#             servoX.setAngle(currAngleX + 2)
+#             currAngleX = servoX.
