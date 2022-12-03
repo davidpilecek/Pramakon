@@ -93,6 +93,8 @@ while True:
     #         cfu.save_pic(index, img_draw)
     #     servoX.setAngle(110)
     #     servoY.setAngle(110)
+    #     robot.straight(conf.pwmMin)
+    #     sleep(0.5)
 
     try:
         cv.imshow("main", img_draw)
