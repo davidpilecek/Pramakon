@@ -1,12 +1,5 @@
-#find object of specific color, get as close to it as possible and take picture of it, then aim back on the track and drive along
-#do NOT get off the track, once you have to turn the camera 90 degrees to the left or right, that means it's as close
-#as possible and therefore you can take a pic of it.
-
-#once the turn is so sharp it has to utilize only one wheel, tilt camera to that direction for one second, then return back
-
-
 from time import sleep
-import time
+
 import cv2 as cv
 import numpy as np
 
@@ -40,11 +33,12 @@ cX, cY = [0, 0]
 
 index = 0
 
-last_time = 0
+last_direction = 0
 
 while True:
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
+    direction = 0
 
     _, frameOrig = cap.read()
 
@@ -58,28 +52,21 @@ while True:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
 
     except Exception as e:
-        print("No contour")
+        print("Trying to find line")
 
+        
+         
     dev, way = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
         if way == 1:
             robot.moveL(conf.basePwm)
-            servoX.setAngle(currAngleX - 50)
-            last_time = time.time()
-            if(time.time() - last_time >= 0.5):
-                servoX.setAngle(currAngleX + 50)
-                last_time = time.time()
+            last_direction = 1
         elif way == -1:
             robot.moveR(conf.basePwm)
-            servoX.setAngle(currAngleX + 50)
-            last_time = time.time()
-            if(time.time() - last_time >= 0.5):
-                servoX.setAngle(currAngleX - 50)
-                last_time = time.time()
-
+            last_direction = -1
     else:
-        cfu.steer(conf.basePwm, dev, way, robot)
+        last_direction = cfu.steer(conf.basePwm, dev, way, robot)
 
     try:
         cv.imshow("main", image_draw)

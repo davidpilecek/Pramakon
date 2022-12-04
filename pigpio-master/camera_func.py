@@ -177,7 +177,6 @@ def contours_line(frameOrig, mask, height, width):
          cX, cY = [0, 0]
          x_pos = 90
 
-    
     average_angle = (ang_vector*0.5 + x_pos*0.5)
 
     average_angle = round(average_angle)
@@ -185,7 +184,6 @@ def contours_line(frameOrig, mask, height, width):
     cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
     return average_angle, image_draw
-
 
 def save_pic(index, image):
 
@@ -195,7 +193,7 @@ def save_pic(index, image):
     
     return path
 
-def contours_obj(img_draw, mask, height, width):
+def contours_obj(img_draw, mask):
 
     cX, cY = [0, 0]
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
@@ -203,7 +201,7 @@ def contours_obj(img_draw, mask, height, width):
     contour = max(contours, key = cv.contourArea, default=0)
 
     x,y,w,h = cv.boundingRect(contour)
-    cv.rectangle(img_draw ,(x,y),(x+w,y+h),(0,0,255),5)
+    cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
 
     if len(contours)>0:
         M = cv.moments(contour)
@@ -213,11 +211,11 @@ def contours_obj(img_draw, mask, height, width):
     else:
         pass
 
-    if cX > int(width / 2):
-             obj_angle = 180 - np.degrees(np.arctan((height - cY) / (cX - int(width / 2))))
+    if cX > int(conf.width / 2):
+             obj_angle = 180 - np.degrees(np.arctan((conf.height - cY) / (cX - int(conf.width / 2))))
 
-    elif cX < int(width / 2):
-             obj_angle = np.degrees(np.arctan((height - cY) / (int(width / 2) - cX )))
+    elif cX < int(conf.width / 2):
+             obj_angle = np.degrees(np.arctan((conf.height - cY) / (int(conf.width / 2) - cX )))
     else:
          cX, cY = [0, 0]
          obj_angle = 90
@@ -225,7 +223,6 @@ def contours_obj(img_draw, mask, height, width):
     obj_angle = round(obj_angle)
 
     return obj_angle, img_draw, cX, cY
-
 
 def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
     if(obj_x > conf.centerX + conf.tol):
@@ -241,14 +238,11 @@ def obj_mask(src, color):
 
     frame = cv.resize(src, (conf.height, conf.width))
 
-    blurred = cv.GaussianBlur(frame, (15, 15), 0)
-
-    hsvImg = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
+    hsvImg = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
     mask = cv.inRange(hsvImg, color[0], color[1])
 
-    return mask, hsvImg
-
+    return mask
 
 # def find_line(last_dir, servoX, servoY, currAngleX, currAngleY):
 #     print("Trying to find line")

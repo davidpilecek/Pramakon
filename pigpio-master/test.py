@@ -59,13 +59,18 @@ while True:
         obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(frameOrig, mask_obj)
     except Exception as e:
         print("No object contour")
-
-    if(angle > 90 + conf.ang_tol):
-          servoX.setAngle(currAngleX - conf.step)
-    elif(angle < 90 - conf.ang_tol):
-          servoX.setAngle(currAngleX + conf.step)
-
-    dev, way = cfu.deviance(angle)
+    
+    if angle == 90:
+        robot.straight(conf.basePwm)
+    elif angle > 90:
+        dev = angle - 90
+        #turn Right
+        way = -1
+    elif angle < 90:
+        dev = 90 - angle
+        #turn Left
+        way = 1
+    
 
     if dev + conf.basePwm > conf.pwmMax:
         if way == 1:
@@ -82,9 +87,20 @@ while True:
             if(time.time() - last_time >= 0.5):
                 servoX.setAngle(currAngleX + 20)
                 last_time = time.time()
-
     else:
-        cfu.steer(conf.basePwm, dev, way, robot)
+        if way == 1:
+        #moving slightly left
+            robot.moveBoth(conf.basePwm - dev, conf.basePwm + dev)
+
+        elif way == -1:
+        #moving slightly right
+            robot.moveBoth(conf.basePwm + dev, conf.basePwm - dev)
+            
+    #shift camera at center of path
+    if(angle > 90 + conf.ang_tol):
+          servoX.setAngle(currAngleX - conf.step)
+    elif(angle < 90 - conf.ang_tol):
+          servoX.setAngle(currAngleX + conf.step)
 
     # if(condition to take pic of object):
     #     robot.stop()
