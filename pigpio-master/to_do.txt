@@ -1,6 +1,14 @@
 1)keep camera at path
+
+
 2)find object of specific color and take picture of it
 3)use AI tool to identify the object
+
+
+
+if no contour, turn cam 10 deg at direction where it was last headed
+
+
 
 1) either: shift camera at path with a delay, so that it makes turning decisions first and only then does the camera turn
        or: from algorithm that determines how much to turn, make a new algorithm that shifts the camera

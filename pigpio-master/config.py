@@ -2,15 +2,15 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 120
+servoY_pos = 100
 
-perc_frame = 20
+perc_frame = 40
 
 tries_to_find = 5
 
 #PWM values
-pwmMin = 30
-pwmMax = 70
+pwmMin = 25
+pwmMax = 65
 basePwm = (pwmMin + pwmMax) / 2
 frequency = 40
 

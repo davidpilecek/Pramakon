@@ -28,9 +28,9 @@ def crop_img_line(img, height, width):
 
     return mask, area
 
-def crop_img_line_color(img, height, width, color):
+def crop_img_line_color(img, height, width, color, sel):
 
-    height_1 = height/conf.crop_selection
+    height_1 = height/sel
 
     vertices = [(0, height_1), (0, height),(width, height), (width, height_1)]
     vertices = np.array([vertices], np.int32)
@@ -177,7 +177,7 @@ def contours_line(frameOrig, mask, height, width):
          cX, cY = [0, 0]
          x_pos = 90
 
-    average_angle = (ang_vector*0.5 + x_pos*0.5)
+    average_angle = (ang_vector*1/2 + x_pos*1/2)
 
     average_angle = round(average_angle)
 
@@ -201,7 +201,8 @@ def contours_obj(img_draw, mask):
     contour = max(contours, key = cv.contourArea, default=0)
 
     x,y,w,h = cv.boundingRect(contour)
-    cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
+    if(w>=conf.width/20 and h >= conf.height/20):
+        cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
 
     if len(contours)>0:
         M = cv.moments(contour)

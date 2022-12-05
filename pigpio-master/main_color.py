@@ -15,25 +15,20 @@ servoX.setAngle(conf.servoX_pos)
 servoY.setAngle(conf.servoY_pos)
 servoX.stopServo()
 servoY.stopServo()
-
 cap = cv.VideoCapture(0)
+
+image_draw = None
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
-
 T = conf.threshold
-
 frame_draw = []
-
 angle = 0
-
 ret = None
-
 cX, cY = [0, 0]
-
 index = 0
-
 last_direction = 0
+selection = conf.crop_selection
 
 while True:
     currAngleX = servoX.getAngle()
@@ -46,14 +41,32 @@ while True:
         pass
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
-        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue)
- 
+        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
+        mask_obj = cfu.obj_mask(blurred, conf.red)
+
     try:
         angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
 
     except Exception as e:
+        robot.stop()
         print("Trying to find line")
- 
+        selection = 100 
+        if(last_direction == -1):
+             servoX.setAngle(100)
+
+        elif(last_direction == 1):
+             servoX.setAngle(120)
+        servoX.setAngle(110)
+        sleep(1)
+
+    try:
+        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
+        print("object found")
+    except Exception as e:
+        
+        print("cannot find object")
+        if image_draw.all() != None:
+             img_draw = image_draw
     dev, way = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
@@ -67,8 +80,8 @@ while True:
         last_direction = cfu.steer(conf.basePwm, dev, way, robot)
 
     try:
-        cv.imshow("main", image_draw)
-    
+        cv.imshow("main", img_draw)
+
     except Exception as e:
         print(str(e))    
 
