@@ -1,7 +1,10 @@
 import numpy as np
 import cv2 as cv
 
-perc_frame = 50
+servoX_pos = 110
+servoY_pos = 120
+
+perc_frame = 20
 
 tries_to_find = 5
 
@@ -12,8 +15,8 @@ basePwm = (pwmMin + pwmMax) / 2
 frequency = 40
 
 #height and width of image
-height = 600
-width = 600
+height = 200
+width = 200
 
 centerY = round(height / 2)
 centerX = round(width / 2)
@@ -34,8 +37,8 @@ ang_tol = 10
 step = 1
 
 #RPi pin config
-leftMot = 19
-rightMot = 13
+leftMot = 13
+rightMot = 19
 servoPinX = 18
 servoPinY = 12
 
@@ -49,7 +52,7 @@ white_min=20
 white_max=50
 
 
-crop_selection = 100/perc_frame
+crop_selection = 100/(100 - perc_frame)
 
 if __name__ == "__main__":
     while True:

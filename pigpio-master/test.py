@@ -119,5 +119,6 @@ while True:
 
     if cv.waitKey(1) == ord('q'):
         break
+robot.stop()
 cap.release()
 cv.destroyAllWindows()

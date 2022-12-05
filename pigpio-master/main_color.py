@@ -11,8 +11,8 @@ robot = dr.Robot(conf.leftMot, conf.rightMot)
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
 
-servoX.setAngle(110)
-servoY.setAngle(110)
+servoX.setAngle(conf.servoX_pos)
+servoY.setAngle(conf.servoY_pos)
 servoX.stopServo()
 servoY.stopServo()
 
@@ -53,9 +53,7 @@ while True:
 
     except Exception as e:
         print("Trying to find line")
-
-        
-         
+ 
     dev, way = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
@@ -70,10 +68,12 @@ while True:
 
     try:
         cv.imshow("main", image_draw)
+    
     except Exception as e:
         print(str(e))    
 
     if cv.waitKey(1) == ord('q'):
         break
+robot.stop()    
 cap.release()
 cv.destroyAllWindows()
