@@ -177,7 +177,7 @@ def contours_line(frameOrig, mask, height, width):
          cX, cY = [0, 0]
          x_pos = 90
 
-    average_angle = (ang_vector*1/2 + x_pos*1/2)
+    average_angle = (ang_vector*1/3 + x_pos*2/3)
 
     average_angle = round(average_angle)
 

@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 100
+servoY_pos = 95
 
 perc_frame = 40
 
