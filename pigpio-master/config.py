@@ -37,8 +37,8 @@ ang_tol = 10
 step = 1
 
 #RPi pin config
-leftMot = 13
-rightMot = 19
+leftMot = 19
+rightMot = 13
 servoPinX = 18
 servoPinY = 12
 

@@ -52,20 +52,6 @@ while True:
         servoY.setAngle(conf.servoY_pos + 20)
         print("set Y high")
         robot.stop()
-        if(dir == -1):
-            print("turning X right")
-            servoX.setAngle(conf.servoX_pos - 20)
-            last_time = time.time()
-            
-        elif(dir == 1):
-            print("turning X left")
-            servoX.setAngle(conf.servoX_pos + 20)
-            last_time = time.time()
-            
-        if(time.time() - last_time >= 0.5):
-            print("returning")
-            servoX.setAngle(conf.servoX_pos)
-            servoY.setAngle(conf.servoY_pos)
 
     try:
         obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
@@ -73,9 +59,7 @@ while True:
     except Exception as e:
         
         print("cannot find object")
-        if image_draw.all() != None:
-             img_draw = image_draw
-    dev, dir = cfu.deviance(angle)
+        dev, dir = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
         if dir == 1:
