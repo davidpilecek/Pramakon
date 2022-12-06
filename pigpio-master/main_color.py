@@ -50,7 +50,6 @@ while True:
     except Exception as e:
         robot.stop()
         print("Trying to find line")
-        selection = 100 
         if(last_direction == -1):
              servoX.setAngle(100)
 

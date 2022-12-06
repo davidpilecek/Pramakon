@@ -9,8 +9,8 @@ perc_frame = 40
 tries_to_find = 5
 
 #PWM values
-pwmMin = 25
-pwmMax = 65
+pwmMin = 30
+pwmMax = 80
 basePwm = (pwmMin + pwmMax) / 2
 frequency = 40
 

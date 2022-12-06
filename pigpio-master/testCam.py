@@ -16,17 +16,13 @@ while True:
     if(type(frame) == type(None) or _ == False):
         pass
 
-    frameShow, height, width = cfu.prep_pic(frame)
-
-
-    try:      
-        cv.imshow("window", frameShow)
+    try:
+        cv.imshow("window", frame)
     except Exception as e:
         print(str(e))
-       
-        
+
     if cv.waitKey(1) == ord('q'):
-        
+
         break
 
 cap.release()
