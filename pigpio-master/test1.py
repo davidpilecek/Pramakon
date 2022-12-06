@@ -41,7 +41,7 @@ while True:
         pass
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
-        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue)
+        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, conf.crop_selection)
         mask_obj = cfu.obj_mask(blurred, conf.red)
                
     try:

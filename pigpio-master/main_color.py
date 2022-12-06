@@ -1,5 +1,5 @@
 from time import sleep
-
+import time
 import cv2 as cv
 import numpy as np
 
@@ -27,14 +27,13 @@ angle = 0
 ret = None
 cX, cY = [0, 0]
 index = 0
-last_direction = 0
 selection = conf.crop_selection
+last_time = 0
 
 while True:
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
     direction = 0
-
     _, frameOrig = cap.read()
 
     if(type(frameOrig) == type(None)):
@@ -50,13 +49,23 @@ while True:
     except Exception as e:
         robot.stop()
         print("Trying to find line")
-        if(last_direction == -1):
-             servoX.setAngle(100)
-
-        elif(last_direction == 1):
-             servoX.setAngle(120)
-        servoX.setAngle(110)
-        sleep(1)
+        servoY.setAngle(conf.servoY_pos + 20)
+        print("set Y high")
+        robot.stop()
+        if(dir == -1):
+            print("turning X right")
+            servoX.setAngle(conf.servoX_pos - 20)
+            last_time = time.time()
+            
+        elif(dir == 1):
+            print("turning X left")
+            servoX.setAngle(conf.servoX_pos + 20)
+            last_time = time.time()
+            
+        if(time.time() - last_time >= 0.5):
+            print("returning")
+            servoX.setAngle(conf.servoX_pos)
+            servoY.setAngle(conf.servoY_pos)
 
     try:
         obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
@@ -66,17 +75,17 @@ while True:
         print("cannot find object")
         if image_draw.all() != None:
              img_draw = image_draw
-    dev, way = cfu.deviance(angle)
+    dev, dir = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
-        if way == 1:
+        if dir == 1:
             robot.moveL(conf.basePwm)
             last_direction = 1
-        elif way == -1:
+        elif dir == -1:
             robot.moveR(conf.basePwm)
             last_direction = -1
     else:
-        last_direction = cfu.steer(conf.basePwm, dev, way, robot)
+        last_direction = cfu.steer(conf.basePwm, dev, dir, robot)
 
     try:
         cv.imshow("main", img_draw)
