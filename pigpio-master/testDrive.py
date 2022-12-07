@@ -89,12 +89,12 @@ while True:
                 robot.moveR(conf.basePwm)
 
         else:
-            last_direction = cfu.steer(conf.basePwm, dev, dir, robot)
+                cfu.steer(conf.basePwm, dev, dir, robot)
     else:
-            robot.stop()
+                robot.stop()
     try:
-        cv.imshow("main", image_draw)
-
+ 
+         cv.imshow("main", image_draw)
     except Exception as e:
         print("no image to print")    
         robot.stop()
