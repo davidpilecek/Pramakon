@@ -1,8 +1,9 @@
+cat testDrive.py 
 from time import sleep
 import time
 import cv2 as cv
 import numpy as np
-
+import threading
 import camera_func as cfu
 import config as conf
 import drive as dr
@@ -17,6 +18,15 @@ servoX.stopServo()
 servoY.stopServo()
 cap = cv.VideoCapture(0)
 
+def servo_delay(servoX, servoY):
+    print("setting servos")
+    servoY.setAngle(conf.servoY_pos + 20)
+    sleep(5)
+    print("resetting servos")
+    servoY.setAngle(conf.servoY_pos)
+
+t1 = threading.Thread(target = servo_delay, args = (servoX, servoY))
+
 image_draw = None
 
 if not cap.isOpened():
@@ -30,7 +40,7 @@ index = 0
 last_time = 0
 try_line = True
 selection = conf.crop_selection
-line_found = 0
+line_found = False
 do_drive = False
 
 while True:
@@ -48,36 +58,35 @@ while True:
         mask_obj = cfu.obj_mask(blurred, conf.red)
 
     if(try_line == False):
-        print("NOT TRYING LINE")
+        #print("NOT TRYING LINE")
         pass
     else:
         try:
             angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-            print("FOUND LINE")
+         #   print("FOUND LINE")
             line_found = 1
             do_drive = True
         except Exception as e:
             print("No line")
             line_found = 0
-            try_line = False
 
-    if (line_found == 0):
+    if (line_found == False  and try_line == True):
          print("stopping bot")
          do_drive = False
-         try_line = True
 
-#         last_time = time.time()
-#         servoY.setAngle(conf.servoY_pos)
+         t1.start()
+         try_line = False
+       #  servoY.setAngle(conf.servoY_pos)
         #if (dir == -1):
         #    print("looking right")
        #     servoX.setAngle(currAngleX + 20)
       #  elif (dir == 1):
      #       print("looking left")
     #        servoX.setAngle(currAngleX - 20)
-#         if(time.time() - last_time >= 5):
+    #     if(time.time() - last_time >= 5):
 #             servoX.setAngle(conf.servoX_pos)
-#             servoY.setAngle(conf.servoY_pos)
-#             print("returned")
+     #        servoY.setAngle(conf.servoY_pos)
+      #       print("returned")
 
     dev, dir = cfu.deviance(angle)
 
@@ -96,7 +105,6 @@ while True:
  
          cv.imshow("main", image_draw)
     except Exception as e:
-        print("no image to print")    
         robot.stop()
     if cv.waitKey(1) == ord('q'):
         break
