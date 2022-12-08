@@ -30,7 +30,9 @@ def crop_img_line(img, height, width):
 
 def crop_img_line_color(img, height, width, color, sel):
 
-    height_1 = height/sel
+    crop_selection = 100/(100 - sel)
+
+    height_1 = height/crop_selection
 
     vertices = [(0, height_1), (0, height),(width, height), (width, height_1)]
     vertices = np.array([vertices], np.int32)

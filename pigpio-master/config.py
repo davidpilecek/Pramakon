@@ -4,7 +4,7 @@ import cv2 as cv
 servoX_pos = 110
 servoY_pos = 95
 
-perc_frame = 40
+frame_select= 40
 
 tries_to_find = 5
 
@@ -50,9 +50,6 @@ threshold_min = 50
 th_iterations = 15
 white_min=20
 white_max=50
-
-
-crop_selection = 100/(100 - perc_frame)
 
 if __name__ == "__main__":
     while True:
