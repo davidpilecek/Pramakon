@@ -2,11 +2,9 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 95
+servoY_pos = 100
 
-frame_select= 40
-
-tries_to_find = 5
+frame_select= 30
 
 #PWM values
 pwmMin = 30

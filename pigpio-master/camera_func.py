@@ -201,9 +201,8 @@ def contours_obj(img_draw, mask):
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
     contour = max(contours, key = cv.contourArea, default=0)
-
-    x,y,w,h = cv.boundingRect(contour)
-    if(w>=conf.width/20 and h >= conf.height/20):
+    for contour in contours:
+        x,y,w,h = cv.boundingRect(contour)
         cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
 
     if len(contours)>0:
@@ -246,13 +245,3 @@ def obj_mask(src, color):
     mask = cv.inRange(hsvImg, color[0], color[1])
 
     return mask
-
-# def find_line(last_dir, servoX, servoY, currAngleX, currAngleY):
-#     print("Trying to find line")
-#     i = 0
-#     while i <= conf.tries_to_find:
-#         servoY.setAngle(currAngleY + 10)
-#         currAngleY = servoY.getAngle()
-#         if(last_dir <= 0):
-#             servoX.setAngle(currAngleX + 2)
-#             currAngleX = servoX.

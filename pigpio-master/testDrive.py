@@ -88,9 +88,17 @@ while True:
          try_line = False
          search_seq(servoX,servoY, dire)
 
+    try:
+        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
+    except Exception as e:
+        print("cannot find object")
+        img_draw = image_draw
+
     dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
+        print("sharp")
+        print(dev)
         if dire == 1:
             robot.moveL(conf.basePwm)
         elif dire == -1:
@@ -98,7 +106,7 @@ while True:
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
     try:
-         cv.imshow("main", image_draw)
+         cv.imshow("main", img_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
