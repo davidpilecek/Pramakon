@@ -188,12 +188,15 @@ def contours_line(frameOrig, mask, height, width):
     return average_angle, image_draw
 
 def save_pic(index, image):
+    """Alway use original image as argument"""
 
     path = conf.path_pic + str(index) + r".jpg"
    
     cv.imwrite(path, image)
-    
-    return path
+
+    index +=1    
+
+    return path, index
 
 def contours_obj(img_draw, mask):
 

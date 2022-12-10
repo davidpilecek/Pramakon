@@ -88,6 +88,18 @@ while True:
          try_line = False
          search_seq(servoX,servoY, dire)
 
+    #if object is at approximately quarter of the height of the image, aim the camera at the center of the object, take picture 
+    #of it, wait a second and then return servos to their original position
+    if (obj_y == conf.height/1.25):
+        while obj_x != conf.centerX and obj_y != conf.centerY:
+            cfu.aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
+            break
+        pic_path, index = cfu.save_pic(index, frameOrig)
+        sleep(1)
+        res_servo()
+
+
+
     try:
         obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
     except Exception as e:
@@ -105,6 +117,7 @@ while True:
             robot.moveR(conf.basePwm)
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
+
     try:
          cv.imshow("main", img_draw)
     except Exception as e:
