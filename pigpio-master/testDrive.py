@@ -15,6 +15,9 @@ servoX.stopServo()
 servoY.stopServo()
 cap = cv.VideoCapture(0)
 
+cap.set(3, 200)
+cap.set(4, 200)
+
 dire = 0
 frame_draw = []
 angle = 0
@@ -97,8 +100,6 @@ while True:
         pic_path, index = cfu.save_pic(index, frameOrig)
         sleep(1)
         res_servo()
-
-
 
     try:
         obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)

@@ -201,12 +201,21 @@ def save_pic(index, image):
 def contours_obj(img_draw, mask):
 
     cX, cY = [0, 0]
-    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
+    contours, hierarchy = cv.findContours(mask, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
     contour = max(contours, key = cv.contourArea, default=0)
+
+    # for contour in contours:
+    #     cont_area = cv.contourArea(contour)
+
+
     for contour in contours:
+        
         x,y,w,h = cv.boundingRect(contour)
-        cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
+        if(w > conf.width/20) and (h > conf.height/20):
+            cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
+
+
 
     if len(contours)>0:
         M = cv.moments(contour)
@@ -241,9 +250,7 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
 
 def obj_mask(src, color):
 
-    frame = cv.resize(src, (conf.height, conf.width))
-
-    hsvImg = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    hsvImg = cv.cvtColor(src, cv.COLOR_BGR2HSV)
 
     mask = cv.inRange(hsvImg, color[0], color[1])
 

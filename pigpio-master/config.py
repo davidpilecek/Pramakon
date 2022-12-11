@@ -9,7 +9,6 @@ frame_select= 30
 #PWM values
 pwmMin = 30
 pwmMax = 80
-basePwm = (pwmMin + pwmMax) / 2
 frequency = 40
 
 #height and width of image
@@ -26,8 +25,7 @@ path_pic = r"/home/pi/Desktop/cvPics/"
 
 blue = np.array([[80,20,100], [135,255,255]])
 
-red = np.array([[170, 70, 50], [180, 255, 255]])
-
+green = np.array([[45, 50, 100], [95, 255, 255]])
 tol = 50
 
 ang_tol = 10
@@ -39,6 +37,8 @@ leftMot = 19
 rightMot = 13
 servoPinX = 18
 servoPinY = 12
+
+basePwm = (pwmMin + pwmMax) / 2
 
 #values for brightness balancing
 increment = 8
@@ -52,7 +52,8 @@ white_max=50
 if __name__ == "__main__":
     while True:
         image = np.zeros((500, 500, 3), np.uint8)
-        image[:] = (80,20,133)
+        image[:] = (90, 60, 100)
+      
         im_conv = cv.cvtColor(image, cv.COLOR_HSV2BGR)
 
         #cv.imshow("image", image)

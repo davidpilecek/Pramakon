@@ -1,17 +1,18 @@
-1)keep camera at path
+-tweak settings and create optimal conditions for keeping robot on the center of the path
 
-2)find object of specific color on the ground and take picture of it
+       variables:
+              a) stepup voltage:
+              b) PWM frequency:
+              c) min PWM value:
+              d) max PWM value:
+              e) ratio of vector to xy position of line contour:
+              f) selection of frame crop:
+              h) position of Y servo:
 
-3)use AI tool to identify the object
+-find object of specific color on the ground and take picture of it
+       detect and highlight it
+       register once it appears, once it enters the defined frame inside screen, turn the camera to it
+       take pic of it
+       move camera away from object, back onto original track, and drive along
 
-
-1) either: shift camera at path with a delay, so that it makes turning decisions first and only then does the camera turn
-       or: from algorithm that determines how much to turn, make a new algorithm that shifts the camera
-
-
-2.1)detect and highlight it
-2.2)register once it appears, once center of obj contour is in middle of Y of image, aim camera at it
-2.3)take pic of it
-2.4)move away from object, back onto original track, and drive along
-
-
+-use AI tool to identify the object
