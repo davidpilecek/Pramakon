@@ -53,7 +53,6 @@ class Servo():
         sleep(0.2)
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
-                   
 if __name__ == "__main__":
          servoX = Servo(conf.servoPinX)
          servoY = Servo(conf.servoPinY)

@@ -16,6 +16,9 @@ servoX.stopServo()
 servoY.stopServo()
 cap = cv.VideoCapture(0)
 
+cap.set(3, 200)
+cap.set(4, 200)
+
 dire = 0
 frame_draw = []
 angle = 0
@@ -89,17 +92,37 @@ while True:
          try_line = False
          search_seq(servoX,servoY, dire)
 
+    #if object is at about to disappear from the image, aim the camera at the center of the object, take picture 
+    #of it, wait a second and then return servos to their original position
+    # if (obj_y == conf.height):
+    #     while obj_x != conf.centerX and obj_y != conf.centerY:
+    #         cfu.aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
+    #         break
+    #     sleep(0.5)
+    #     pic_path, index = cfu.save_pic(index, frameOrig)
+    #     sleep(0.5)
+    #     res_servo()
+
+    try:
+        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
+    except Exception as e:
+        print("cannot find object")
+        img_draw = image_draw
+
     dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
+        print("sharp")
+        print(dev)
         if dire == 1:
             robot.moveL(conf.basePwm)
         elif dire == -1:
             robot.moveR(conf.basePwm)
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
+
     try:
-         cv.imshow("main", image_draw)
+         cv.imshow("main", img_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):

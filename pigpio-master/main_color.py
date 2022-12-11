@@ -1,8 +1,8 @@
 from time import sleep
-
+import time
 import cv2 as cv
 import numpy as np
-
+import threading
 import camera_func as cfu
 import config as conf
 import drive as dr
@@ -11,29 +11,58 @@ robot = dr.Robot(conf.leftMot, conf.rightMot)
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
 
-servoX.setAngle(conf.servoX_pos)
-servoY.setAngle(conf.servoY_pos)
 servoX.stopServo()
 servoY.stopServo()
 cap = cv.VideoCapture(0)
 
-image_draw = None
-
-if not cap.isOpened():
-    raise IOError("Cannot open webcam")
-T = conf.threshold
+dire = 0
 frame_draw = []
 angle = 0
 ret = None
 cX, cY = [0, 0]
 index = 0
-last_direction = 0
-selection = conf.crop_selection
+res = True
+last_time = 0
+try_line = True
+selection = conf.frame_select
+line_found = True
+line_count = 0
+
+def search_seq(servoX, servoY, dire):
+    robot.stop()
+    global try_line
+    global line_count
+    line_count = 0
+    print("setting servos")
+    servoY.setAngle(conf.servoY_pos + 20)
+    selection = conf.frame_select + 50
+    if (dire == -1):
+        print("looking right")
+        servoX.setAngle(conf.servoX_pos - 20)
+    elif(dire == 1):
+        print("looking left")
+        servoX.setAngle(conf.servoX_pos + 20)
+    sleep(0.2)
+    try_line = True
+
+def res_servo():
+    global servoX
+    global servoY
+    global selection
+    selection = conf.frame_select
+    servoX.setAngle(conf.servoX_pos)
+    servoY.setAngle(conf.servoY_pos)
+
+image_draw = None
+
+if not cap.isOpened():
+    raise IOError("Cannot open webcam")
+
+res_servo()
 
 while True:
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
-    direction = 0
 
     _, frameOrig = cap.read()
 
@@ -42,43 +71,40 @@ while True:
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
-        mask_obj = cfu.obj_mask(blurred, conf.red)
 
-    try:
-        angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
+    if(try_line == False):
+        pass
+    else:
+        try:
+            angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
+            res_servo()
+            line_found = True
+            line_count += 1
+        except Exception as e:
+            line_found = False
 
-    except Exception as e:
-        robot.stop()
-        print("Trying to find line")
-        sleep(1)
-        
-    try:
-        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
-        print("object found")
-    except Exception as e:
-        print("cannot find object")
-        if image_draw.all() != None:
-             img_draw = image_draw
-    dev, way = cfu.deviance(angle)
+    if (line_found == False  and try_line == True):
+         try_line = False
+         search_seq(servoX,servoY, dire)
+
+    dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
-        if way == 1:
+        print("sharp")
+        print(dev)
+        if dire == 1:
             robot.moveL(conf.basePwm)
-            last_direction = 1
-        elif way == -1:
+        elif dire == -1:
             robot.moveR(conf.basePwm)
-            last_direction = -1
     else:
-        last_direction = cfu.steer(conf.basePwm, dev, way, robot)
-
+            cfu.steer(conf.basePwm, dev, dire, robot)
     try:
-        cv.imshow("main", img_draw)
-
+         cv.imshow("main", image_draw)
     except Exception as e:
-        print(str(e))    
-
+        robot.stop()
     if cv.waitKey(1) == ord('q'):
         break
-robot.stop()    
+res_servo()
+robot.stop()
 cap.release()
 cv.destroyAllWindows()
