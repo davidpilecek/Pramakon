@@ -2,14 +2,14 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 100
+servoY_pos = 75
 
-frame_select= 30
+frame_select= 60
 
 #PWM values
-pwmMin = 30
+pwmMin = 50
 pwmMax = 80
-frequency = 40
+frequency = 25
 
 #height and width of image
 height = 200
@@ -35,8 +35,8 @@ step = 1
 #RPi pin config
 leftMot = 19
 rightMot = 13
-servoPinX = 18
-servoPinY = 12
+servoPinX = 12
+servoPinY = 18
 
 basePwm = (pwmMin + pwmMax) / 2
 

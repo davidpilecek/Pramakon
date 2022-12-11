@@ -56,7 +56,14 @@ class Servo():
 if __name__ == "__main__":
          servoX = Servo(conf.servoPinX)
          servoY = Servo(conf.servoPinY)
-         servoX.setAngle(130)
+         robot = Robot(conf.leftMot, conf.rightMot)
+         for i in range(100):
+             robot.straight(i)
+             print(i)
+             sleep(0.1)
+         robot.stop()
+         servoX.setAngle(110)
          servoY.setAngle(110)
          servoX.stopServo()
          servoY.stopServo()
+         
