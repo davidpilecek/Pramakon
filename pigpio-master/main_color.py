@@ -71,7 +71,6 @@ while True:
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
-        mask_obj = cfu.obj_mask(blurred, conf.red)
 
     if(try_line == False):
         pass
@@ -88,12 +87,6 @@ while True:
          try_line = False
          search_seq(servoX,servoY, dire)
 
-    try:
-        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
-    except Exception as e:
-        print("cannot find object")
-        img_draw = image_draw
-
     dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
@@ -106,12 +99,12 @@ while True:
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
     try:
-         cv.imshow("main", img_draw)
+         cv.imshow("main", image_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
         break
-
+res_servo()
 robot.stop()
 cap.release()
 cv.destroyAllWindows()

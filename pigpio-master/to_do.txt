@@ -11,8 +11,14 @@
 
 -find object of specific color on the ground and take picture of it
        detect and highlight it
-       register once it appears, once it enters the defined frame inside screen, turn the camera to it
+       once it reaches a point in the image frame, turn the camera to it
        take pic of it
        move camera away from object, back onto original track, and drive along
 
 -use AI tool to identify the object
+       run program for however long, while it collects pictures of objects
+       when program finishes, go into folder where images are saved, iterate through them and classify them and create database and new folder
+       with the same pictures but now classified
+
+       resources:
+       https://www.youtube.com/watch?v=oU5oMN_BToU&ab_channel=AdamDabdoub
