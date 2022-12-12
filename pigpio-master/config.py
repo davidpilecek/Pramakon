@@ -2,14 +2,14 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 100
+servoY_pos = 90
 
-frame_select= 30
+frame_select= 55
 
 #PWM values
-pwmMin = 30
+pwmMin = 50
 pwmMax = 80
-frequency = 40
+frequency = 25
 
 #height and width of image
 height = 200
@@ -23,7 +23,7 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 
 path_pic = r"/home/pi/Desktop/cvPics/"
 
-blue = np.array([[80,20,100], [135,255,255]])
+blue = np.array([[96,20,100], [135,255,255]])
 
 green = np.array([[45, 50, 100], [95, 255, 255]])
 tol = 50
@@ -35,8 +35,8 @@ step = 1
 #RPi pin config
 leftMot = 19
 rightMot = 13
-servoPinX = 18
-servoPinY = 12
+servoPinX = 12
+servoPinY = 18
 
 basePwm = (pwmMin + pwmMax) / 2
 

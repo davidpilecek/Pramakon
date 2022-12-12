@@ -17,8 +17,6 @@ new_frame_time = 0
 #cap.set(cv.CAP_PROP_FRAME_HEIGHT, 200)
 
 fps_count = []
-height, width = cap.shape[:2]
-
 
 while True:
 
@@ -47,9 +45,6 @@ while True:
     # by using putText function
     fps = str(fps)
  
-    # putting the FPS count on the frame
-    cv.putText(frame, fps, (7, 70), font, 3, (100, 255, 0), 3, cv.LINE_AA)
- 
 
 
     try:
@@ -61,12 +56,9 @@ while True:
     if cv.waitKey(1) == ord('q'):
 
         break
-    
 print("average:")
+
 print(int(sum(fps_count) / len(fps_count)))
-print("height, width:")
-print(height)
-print(width)
 cap.release()
 
 cv.destroyAllWindows()
