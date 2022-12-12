@@ -27,6 +27,8 @@ try_line = True
 selection = conf.frame_select
 line_found = True
 line_count = 0
+sharp = 0
+
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -45,25 +47,23 @@ def search_seq(servoX, servoY, dire):
     sleep(0.2)
     try_line = True
 
-def res_servo():
-    global servoX
-    global servoY
+def res_servo(servoX, servoY):
     global selection
     selection = conf.frame_select
     servoX.setAngle(conf.servoX_pos)
     servoY.setAngle(conf.servoY_pos)
+    print("reset servo")
 
 image_draw = None
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
-res_servo()
+res_servo(servoX, servoY)
 
 while True:
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
-
     _, frameOrig = cap.read()
 
     if(type(frameOrig) == type(None)):
@@ -77,21 +77,21 @@ while True:
     else:
         try:
             angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-            res_servo()
+            #res_servo(servoX, servoY)
             line_found = True
             line_count += 1
         except Exception as e:
             line_found = False
-
+            res_servo(servoX, servoY)
     if (line_found == False  and try_line == True):
          try_line = False
-         search_seq(servoX,servoY, dire)
+         search_seq(servoX, servoY, dire)
+
 
     dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
-        print("sharp")
-        print(dev)
+        sharp +=1
         if dire == 1:
             robot.moveL(conf.basePwm)
         elif dire == -1:
@@ -104,7 +104,10 @@ while True:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
         break
-res_servo()
+print(sharp)
+res_servo(servoX, servoY)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()
+
+

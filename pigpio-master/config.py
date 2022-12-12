@@ -2,9 +2,9 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 75
+servoY_pos = 90
 
-frame_select= 60
+frame_select= 55
 
 #PWM values
 pwmMin = 50
@@ -23,7 +23,7 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 
 path_pic = r"/home/pi/Desktop/cvPics/"
 
-blue = np.array([[80,20,100], [135,255,255]])
+blue = np.array([[96,20,100], [135,255,255]])
 
 green = np.array([[45, 50, 100], [95, 255, 255]])
 tol = 50

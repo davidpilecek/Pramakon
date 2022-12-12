@@ -29,7 +29,6 @@ line_found = True
 line_count = 0
 sharp = 0
 
-
 def search_seq(servoX, servoY, dire):
     robot.stop()
     global try_line
@@ -64,7 +63,6 @@ res_servo(servoX, servoY)
 while True:
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
-    print(currAngleX)
     _, frameOrig = cap.read()
 
     if(type(frameOrig) == type(None)):
@@ -72,13 +70,13 @@ while True:
     else:
         blurred, height, width = cfu.prep_pic(frameOrig)
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
-
+        mask_obj = cfu.obj_mask(blurred, conf.green)
+        
     if(try_line == False):
         pass
     else:
         try:
             angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
-            #res_servo(servoX, servoY)
             line_found = True
             line_count += 1
         except Exception as e:
@@ -87,6 +85,14 @@ while True:
     if (line_found == False  and try_line == True):
          try_line = False
          search_seq(servoX, servoY, dire)
+         sleep(0.3)
+         res_servo(servoX, servoY)
+
+    try:
+        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
+    except Exception as e:
+        img_draw = image_draw
+        print("cannot find object")
 
     #if object is at about to disappear from the image, aim the camera at the center of the object, take picture 
     #of it, wait a second and then return servos to their original position
@@ -111,7 +117,7 @@ while True:
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
     try:
-         cv.imshow("main", image_draw)
+         cv.imshow("main", img_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
