@@ -51,16 +51,10 @@ while True:
         blurred, height, width = cfu.prep_pic(frameOrig)
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
         mask_obj = cfu.obj_mask(blurred, conf.green)
-  
-    try:
-        angle, image_draw = cfu.contours_line(blurred, ret, height, width)
-    except Exception as e:
-        print("noline")
         
     try:
-        #obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-
+        print(len(contours))
         for contour in contours:
             M = cv.moments(contour)
             if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
@@ -77,8 +71,8 @@ while True:
                         obj_in_line = True
                     else:
                         prev_obj_in_line = False
-                    cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
-                    cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
+                    cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
+                    cv.putText(blurred, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
 
     except Exception as e:
         print("cannot find object")
@@ -89,7 +83,7 @@ while True:
        print(path)
        
     try:
-        cv.imshow("main", image_draw)
+        cv.imshow("main", blurred)
         cv.imshow("mask", mask_obj)
     except Exception as e:
         print(str(e))

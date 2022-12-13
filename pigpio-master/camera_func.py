@@ -221,7 +221,7 @@ def steer(basePwm, dev, way, robot):
 def save_pic(index, image):
     """Alway use original image as argument"""
 
-    path = conf.path_pic_Pi + str(index) + r".jpg"
+    path = conf.path_pic + str(index) + r".jpg"
    
     cv.imwrite(path, image)
 
