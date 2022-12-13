@@ -1,4 +1,3 @@
-cat testDrive.py 
 from time import sleep
 import time
 import cv2 as cv
@@ -72,12 +71,13 @@ while True:
         blurred, height, width = cfu.prep_pic(frameOrig)
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
         mask_obj = cfu.obj_mask(blurred, conf.green)
+  
         
     if(try_line == False):
         pass
     else:
         try:
-            angle, image_draw = cfu.contours_line(frameOrig, ret, height, width)
+            angle, image_draw = cfu.contours_line(blurred, ret, height, width)
             line_found = True
             line_count += 1
         except Exception as e:
@@ -89,22 +89,32 @@ while True:
          sleep(0.3)
          res_servo(servoX, servoY)
 
-    try:
-        obj_angle, img_draw, obj_x, obj_y = cfu.contours_obj(image_draw, mask_obj)
-    except Exception as e:
-        img_draw = image_draw
-        print("cannot find object")
 
-    #if object is at about to disappear from the image, aim the camera at the center of the object, take picture 
-    #of it, wait a second and then return servos to their original position
-    # if (obj_y == conf.height):
-    #     while obj_x != conf.centerX and obj_y != conf.centerY:
-    #         cfu.aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY)
-    #         break
-    #     sleep(0.5)
-    #     pic_path, index = cfu.save_pic(index, frameOrig)
-    #     sleep(0.5)
-    #     res_servo()
+
+    try:
+        contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
+
+        for contour in contours:
+            M = cv.moments(contour)
+            if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                string = str(cX) + " " + str(cY)
+                x,y,w,h = cv.boundingRect(contour)
+                if(w > conf.width/30) and (h > conf.height/30):
+                    color = (255, 0, 255)
+                    obj_in_line = False
+                    
+                    if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
+                        color = (255, 255, 0)
+                        obj_in_line = True
+                    else:
+                        prev_obj_in_line = False
+                    cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
+                    cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
+
+    except Exception as e:
+        print("cannot find object")
 
     dev, dire = cfu.deviance(angle)
 
@@ -118,7 +128,7 @@ while True:
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
     try:
-         cv.imshow("main", img_draw)
+         cv.imshow("main", image_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):

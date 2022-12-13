@@ -21,11 +21,11 @@ centerX = round(width / 2)
 pathPC = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
 pathPi = r"/home/pi/Desktop/video.mp4"
 
-path_pic = r"/home/pi/Desktop/cvPics/"
+path_pic = r"C:\Users\David\Desktop\cvPics\img"
 
 blue = np.array([[96,20,100], [135,255,255]])
 
-green = np.array([[45, 50, 100], [95, 255, 255]])
+green = np.array([[45, 130, 90], [95, 255, 255]])
 tol = 50
 
 ang_tol = 10
@@ -52,7 +52,7 @@ white_max=50
 if __name__ == "__main__":
     while True:
         image = np.zeros((500, 500, 3), np.uint8)
-        image[:] = (90, 60, 100)
+        image[:] = (45, 110, 200)
       
         im_conv = cv.cvtColor(image, cv.COLOR_HSV2BGR)
 

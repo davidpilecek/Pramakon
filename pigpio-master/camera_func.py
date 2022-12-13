@@ -62,6 +62,37 @@ def contours_line(frameOrig, mask, height, width):
 
     return average_angle, image_draw
 
+def crop_img_obj(img, w, h):
+
+    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+#left column
+    vertices_lc = [(0, 0.66*h), (0, h), (0.1*w, h), (0.1*w, 0.66*h)]
+    vertices_lc = np.array([vertices_lc], np.int32)
+
+#right column
+    vertices_rc = [(0.9*w, 0.66*h), (0.9*w, h), (w, h), (w, 0.66*h)]
+    vertices_rc = np.array([vertices_rc], np.int32)
+
+#middle lower layer
+    vertices_ll = [(0.1*w, 0.9*h), (0.1*w, h), (0.9*w, h), (0.9*w, 0.9*h)]
+    vertices_ll = np.array([vertices_ll], np.int32)
+
+    #create pure black frame size of image
+    mask = np.zeros_like(img)
+
+    match_mask_color = 255
+
+    #create pure white frame in area of interest
+    cv.fillPoly(mask, vertices_lc, match_mask_color)
+    cv.fillPoly(mask, vertices_ll, match_mask_color)
+    cv.fillPoly(mask, vertices_rc, match_mask_color)
+
+    #return image with other area than AOI non-reactive to contour seeking algorithm
+    masked_image = cv.bitwise_and(img, mask)
+
+    return masked_image
+
 def crop_img_line(img, height, width):
 
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -187,8 +218,6 @@ def steer(basePwm, dev, way, robot):
         robot.straight(basePwm)
     return way
 
-
-
 def save_pic(index, image):
     """Alway use original image as argument"""
 
@@ -205,19 +234,14 @@ def contours_obj(img_draw, mask):
     cX, cY = [0, 0]
     contours, hierarchy = cv.findContours(mask, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
-    contour = max(contours, key = cv.contourArea, default=0)
-
+    #contour = max(contours, key = cv.contourArea , default=0)
     # for contour in contours:
     #     cont_area = cv.contourArea(contour)
 
-
     for contour in contours:
-        
         x,y,w,h = cv.boundingRect(contour)
         if(w > conf.width/20) and (h > conf.height/20):
             cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
-
-
 
     if len(contours)>0:
         M = cv.moments(contour)
@@ -226,7 +250,7 @@ def contours_obj(img_draw, mask):
             cY = int(M["m01"] / M["m00"])
     else:
         pass
-
+    
     if cX > int(conf.width / 2):
              obj_angle = 180 - np.degrees(np.arctan((conf.height - cY) / (cX - int(conf.width / 2))))
 
