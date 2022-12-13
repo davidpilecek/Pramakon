@@ -54,7 +54,7 @@ def contours_line(frameOrig, mask, height, width):
          cX, cY = [0, 0]
          x_pos = 90
 
-    average_angle = (ang_vector*0.45 + x_pos*0.55)
+    average_angle = (ang_vector*0.4 + x_pos*0.6)
 
     average_angle = round(average_angle)
 
@@ -218,10 +218,10 @@ def steer(basePwm, dev, way, robot):
         robot.straight(basePwm)
     return way
 
-def save_pic(index, image):
+def save_pic(index, image, path_pic):
     """Alway use original image as argument"""
 
-    path = conf.path_pic + str(index) + r".jpg"
+    path = path_pic + str(index) + r".jpg"
    
     cv.imwrite(path, image)
 

@@ -5,7 +5,7 @@
               b) PWM frequency:25
               c) min PWM value:50
               d) max PWM value:90
-              e) ratio of vector to xy position of line contour:0.45/0.55
+              e) ratio of vector to xy position of line contour:0.4/0.6
               f) selection of frame crop:55
               h) position of Y servo:90
 

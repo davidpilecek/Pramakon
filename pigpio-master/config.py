@@ -7,13 +7,13 @@ servoY_pos = 90
 frame_select= 55
 
 #PWM values
-pwmMin = 53
+pwmMin = 50
 pwmMax = 80
 frequency = 25
 
 #height and width of image
-height = 400
-width = 400
+height = 200
+width = 200
 
 centerY = round(height / 2)
 centerX = round(width / 2)

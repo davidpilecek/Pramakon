@@ -105,16 +105,17 @@ while True:
                     color = (255, 0, 255)
                     obj_in_line = False
                     
-                    if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
+                    if(y>= 0.66 * conf.height-10 and y<= 0.66 * conf.height+10):
                         color = (255, 255, 0)
                         obj_in_line = True
                         if(prev_obj_in_line == False):
                             prev_obj_in_line = True
                             robot.stop()
-                            sleep(0.5)
-                            path, index = cfu.save_pic(index, image_draw)
-                           
+                            sleep(1)
+                            path, index = cfu.save_pic(index, image_draw, conf.path_pic_Pi)
                             print(path)
+                            sleep(0.5)
+                            
                     else:
                         prev_obj_in_line = False
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
