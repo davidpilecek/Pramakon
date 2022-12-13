@@ -27,7 +27,9 @@ try_line = True
 selection = conf.frame_select
 line_found = True
 line_count = 0
-sharp = 0
+obj_in_line = False
+prev_obj_in_line = False
+
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -89,8 +91,6 @@ while True:
          sleep(0.3)
          res_servo(servoX, servoY)
 
-
-
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
@@ -108,6 +108,13 @@ while True:
                     if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
                         color = (255, 255, 0)
                         obj_in_line = True
+                        if(prev_obj_in_line == False):
+                            prev_obj_in_line = True
+                            robot.stop()
+                            sleep(0.5)
+                            path, index = cfu.save_pic(index, image_draw)
+                           
+                            print(path)
                     else:
                         prev_obj_in_line = False
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
@@ -119,8 +126,6 @@ while True:
     dev, dire = cfu.deviance(angle)
 
     if dev + conf.basePwm > conf.pwmMax:
-#         print(dev)
-        sharp +=1
         if dire == 1:
             robot.moveL(conf.basePwm)
         elif dire == -1:
@@ -133,7 +138,7 @@ while True:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
         break
-print(sharp)
+
 res_servo(servoX, servoY)
 robot.stop()
 cap.release()

@@ -7,13 +7,13 @@ servoY_pos = 90
 frame_select= 55
 
 #PWM values
-pwmMin = 50
+pwmMin = 53
 pwmMax = 80
 frequency = 25
 
 #height and width of image
-height = 200
-width = 200
+height = 400
+width = 400
 
 centerY = round(height / 2)
 centerX = round(width / 2)
@@ -22,6 +22,7 @@ pathPC = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
 pathPi = r"/home/pi/Desktop/video.mp4"
 
 path_pic = r"C:\Users\David\Desktop\cvPics\img"
+path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
 
 blue = np.array([[96,20,100], [135,255,255]])
 

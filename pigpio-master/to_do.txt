@@ -1,19 +1,21 @@
 -tweak settings and create optimal conditions for keeping robot on the center of the path
 
        variables:
-              a) stepup voltage:
-              b) PWM frequency:
-              c) min PWM value:
-              d) max PWM value:
-              e) ratio of vector to xy position of line contour:
-              f) selection of frame crop:
-              h) position of Y servo:
+              a) stepup voltage:4.2
+              b) PWM frequency:25
+              c) min PWM value:50
+              d) max PWM value:90
+              e) ratio of vector to xy position of line contour:0.45/0.55
+              f) selection of frame crop:55
+              h) position of Y servo:90
 
 -find object of specific color on the ground and take picture of it
-       detect and highlight it
-       once it reaches a point in the image frame, turn the camera to it
-       take pic of it
-       move camera away from object, back onto original track, and drive along
+       -detect and highlight it
+	if it's in a position that's within a radius of object that's already shot, ignore it	
+        once it reaches a point in the image frame, 
+	check whether it's already been taken a pic of, if so ignore it, else
+        turn the camera to it and take pic of it
+        move camera away from object, back onto original track, and drive along
 
 -use AI tool to identify the object
        run program for however long, while it collects pictures of objects
