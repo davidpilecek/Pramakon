@@ -265,14 +265,28 @@ def contours_obj(img_draw, mask):
     return obj_angle, img_draw, cX, cY
 
 def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
+    cent_x = False
+    cent_y = False
     if(obj_x > conf.centerX + conf.tol):
           servoX.setAngle(currAngleX - conf.step)
+          cent_x = False
     elif(obj_x < conf.centerX - conf.tol):
           servoX.setAngle(currAngleX + conf.step)
+          cent_x = False
+    else:
+        cent_x = True
     if(obj_y > conf.centerY + conf.tol):
           servoY.setAngle(currAngleY - conf.step)
+          cent_y = False
     elif(obj_y < conf.centerY - conf.tol):
           servoY.setAngle(currAngleY + conf.step)
+          cent_y = False
+    else:
+        cent_y = True
+    if(cent_x and cent_y):
+        return True
+    else:
+        return False
 
 def obj_mask(src, color):
 

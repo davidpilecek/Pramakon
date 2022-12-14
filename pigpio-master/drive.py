@@ -55,8 +55,8 @@ class Servo():
 
 if __name__ == "__main__":
          robot = Robot(conf.leftMot, conf.rightMot)
-         robot.straight(50)
-         sleep(1)
+         robot.stop()
+         
         
          
 

@@ -27,7 +27,7 @@ path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
 blue = np.array([[96,20,100], [135,255,255]])
 
 green = np.array([[45, 130, 90], [95, 255, 255]])
-tol = 50
+tol = 5
 
 ang_tol = 10
 
