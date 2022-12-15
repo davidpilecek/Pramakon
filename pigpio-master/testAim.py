@@ -1,8 +1,6 @@
 from time import sleep
-import time
 import cv2 as cv
 import numpy as np
-import threading
 import camera_func as cfu
 import config as conf
 import drive as dr
@@ -29,7 +27,9 @@ line_count = 0
 obj_in_line = False
 prev_obj_in_line = False
 centered = False
-last_cont = []
+last_cont = ()
+
+
 
 def res_servo(servoX, servoY):
     global selection
@@ -70,12 +70,12 @@ while True:
                 string = str(cX) + " " + str(cY)
                 x,y,w,h = cv.boundingRect(contour)
                 if(w > conf.width/30) and (h > conf.height/30):
+
                     color = (255, 0, 255)
-                    
-                    
-                    if(y>= 0.66 * conf.height-10 and y<= 0.66 * conf.height+10):
+                    if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
                         color = (255, 255, 0)
-                        obj_in_line = True                            
+                        obj_in_line = True
+                        last_cont = (cX, cY)                            
 
                     cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
                     cv.putText(blurred, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
@@ -83,12 +83,14 @@ while True:
     except Exception as e:
         print("cannot find object")
     if(obj_in_line == True):
-        centered = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
-        if (centered == True):
-           path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
-           obj_in_line = False
-           res_servo(servoX, servoY)
-           print(path)
+        orig = cfu.check_orig()
+        if(orig):
+            centered = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
+            if (centered == True):
+                path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
+                obj_in_line = False
+                res_servo(servoX, servoY)
+                print(path)
 
     try:
          cv.imshow("main", blurred)

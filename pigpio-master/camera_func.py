@@ -1,8 +1,12 @@
 import cv2 as cv
 import numpy as np
-
 import config as conf
-import time
+
+def check_orig(last_cont):
+    global cX, cY
+    if(cX <= last_cont[0] + 10 and  cX >= last_cont[0] - 10 and  cY <= last_cont[1] + 10 and cY >= last_cont[1] - 10):
+        return False
+    else: return True
 
 def contours_line(frameOrig, mask, height, width):
 
