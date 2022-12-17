@@ -83,7 +83,7 @@ while True:
     except Exception as e:
         print("cannot find object")
     if(obj_in_line == True):
-        orig = cfu.check_orig()
+        orig = cfu.check_orig(last_cont)
         if(orig):
             centered = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
             if (centered == True):

@@ -2,15 +2,14 @@ import cv2 as cv
 import numpy as np
 import config as conf
 
-def check_orig(last_cont):
-    global cX, cY
-    if(cX <= last_cont[0] + 10 and  cX >= last_cont[0] - 10 and  cY <= last_cont[1] + 10 and cY >= last_cont[1] - 10):
+def check_orig(curr_cont, last_cont):
+    cX, cY = curr_cont[:2]
+    if(last_cont == ()): return True
+    elif(cX <= last_cont[0] + 10 and  cX >= last_cont[0] - 10 and  cY <= last_cont[1] + 10 and cY >= last_cont[1] - 10):
         return False
     else: return True
 
-def contours_line(frameOrig, mask, height, width):
-
-    image_draw = cv.resize(frameOrig, [height, width])
+def contours_line(image_draw, mask, height, width):
 
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
@@ -65,37 +64,6 @@ def contours_line(frameOrig, mask, height, width):
     cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
     return average_angle, image_draw
-
-def crop_img_obj(img, w, h):
-
-    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-#left column
-    vertices_lc = [(0, 0.66*h), (0, h), (0.1*w, h), (0.1*w, 0.66*h)]
-    vertices_lc = np.array([vertices_lc], np.int32)
-
-#right column
-    vertices_rc = [(0.9*w, 0.66*h), (0.9*w, h), (w, h), (w, 0.66*h)]
-    vertices_rc = np.array([vertices_rc], np.int32)
-
-#middle lower layer
-    vertices_ll = [(0.1*w, 0.9*h), (0.1*w, h), (0.9*w, h), (0.9*w, 0.9*h)]
-    vertices_ll = np.array([vertices_ll], np.int32)
-
-    #create pure black frame size of image
-    mask = np.zeros_like(img)
-
-    match_mask_color = 255
-
-    #create pure white frame in area of interest
-    cv.fillPoly(mask, vertices_lc, match_mask_color)
-    cv.fillPoly(mask, vertices_ll, match_mask_color)
-    cv.fillPoly(mask, vertices_rc, match_mask_color)
-
-    #return image with other area than AOI non-reactive to contour seeking algorithm
-    masked_image = cv.bitwise_and(img, mask)
-
-    return masked_image
 
 def crop_img_line(img, height, width):
 
@@ -238,10 +206,6 @@ def contours_obj(img_draw, mask):
     cX, cY = [0, 0]
     contours, hierarchy = cv.findContours(mask, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
-    #contour = max(contours, key = cv.contourArea , default=0)
-    # for contour in contours:
-    #     cont_area = cv.contourArea(contour)
-
     for contour in contours:
         x,y,w,h = cv.boundingRect(contour)
         if(w > conf.width/20) and (h > conf.height/20):
@@ -254,7 +218,7 @@ def contours_obj(img_draw, mask):
             cY = int(M["m01"] / M["m00"])
     else:
         pass
-    
+    cv.circle(img_draw, (cX, cY), 5, (255, 0, 255), -1)
     if cX > int(conf.width / 2):
              obj_angle = 180 - np.degrees(np.arctan((conf.height - cY) / (cX - int(conf.width / 2))))
 
@@ -299,3 +263,34 @@ def obj_mask(src, color):
     mask = cv.inRange(hsvImg, color[0], color[1])
 
     return mask
+
+def crop_img_obj(img, w, h):
+
+    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    #left column
+    vertices_lc = [(0, 0.66*h), (0, h), (0.1*w, h), (0.1*w, 0.66*h)]
+    vertices_lc = np.array([vertices_lc], np.int32)
+
+    #right column
+    vertices_rc = [(0.9*w, 0.66*h), (0.9*w, h), (w, h), (w, 0.66*h)]
+    vertices_rc = np.array([vertices_rc], np.int32)
+
+    #middle lower layer
+    vertices_ll = [(0.1*w, 0.9*h), (0.1*w, h), (0.9*w, h), (0.9*w, 0.9*h)]
+    vertices_ll = np.array([vertices_ll], np.int32)
+
+    #create pure black frame size of image
+    mask = np.zeros_like(img)
+
+    match_mask_color = 255
+
+    #create pure white frame in area of interest
+    cv.fillPoly(mask, vertices_lc, match_mask_color)
+    cv.fillPoly(mask, vertices_ll, match_mask_color)
+    cv.fillPoly(mask, vertices_rc, match_mask_color)
+
+    #return image with other area than AOI non-reactive to contour seeking algorithm
+    masked_image = cv.bitwise_and(img, mask)
+
+    return masked_image

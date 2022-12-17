@@ -19,6 +19,10 @@ line_count = 0
 image_draw = None
 obj_in_line = False
 prev_obj_in_line = False
+last_cont = ()
+curr_cont = ()
+orig = False
+center = False
 
 def contours_obj(img_draw, mask):
 
@@ -44,7 +48,7 @@ if not cap.isOpened():
 
 while True:
     _, frameOrig = cap.read()
-
+    print(orig)
     if(type(frameOrig) == type(None)):
         pass
     else:
@@ -54,7 +58,7 @@ while True:
         
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-        print(len(contours))
+        
         for contour in contours:
             M = cv.moments(contour)
             if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
@@ -62,13 +66,14 @@ while True:
                 cY = int(M["m01"] / M["m00"])
                 string = str(cX) + " " + str(cY)
                 x,y,w,h = cv.boundingRect(contour)
-                if(w > conf.width/30) and (h > conf.height/30):
+                if(w > conf.width/20) and (h > conf.height/20):
                     color = (255, 0, 255)
                     obj_in_line = False
                     
                     if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
                         color = (255, 255, 0)
                         obj_in_line = True
+                        curr_cont = (cX, cY) 
                     else:
                         prev_obj_in_line = False
                     cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
@@ -76,12 +81,20 @@ while True:
 
     except Exception as e:
         print("cannot find object")
-
+    
     if(obj_in_line == True and prev_obj_in_line == False):
-       prev_obj_in_line = True
-       path, index = cfu.save_pic(index, frameOrig)
-       print(path)
-       
+        orig = cfu.check_orig(curr_cont, last_cont)
+        print("in line")
+        prev_obj_in_line = True
+        center = True
+        if(orig):
+            print("orig, centering")
+            last_cont = (cX, cY)
+    if(center and orig and (cX < conf.centerX + conf.tol) and (cX>conf.centerX-conf.tol) and (cY < conf.centerY + conf.tol) and (cY>conf.centerY-conf.tol)):
+            path, index = cfu.save_pic(index, frameOrig, r"C:\Users\david\Desktop\cvPics\img")
+            print(path)    
+
+    cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2)
     try:
         cv.imshow("main", blurred)
         cv.imshow("mask", mask_obj)

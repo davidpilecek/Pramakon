@@ -2,7 +2,6 @@ from time import sleep
 import time
 import cv2 as cv
 import numpy as np
-import threading
 import camera_func as cfu
 import config as conf
 import drive as dr
@@ -74,7 +73,6 @@ while True:
         ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
         mask_obj = cfu.obj_mask(blurred, conf.green)
   
-        
     if(try_line == False):
         pass
     else:
