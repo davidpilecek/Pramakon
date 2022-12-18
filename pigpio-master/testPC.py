@@ -22,7 +22,7 @@ prev_obj_in_line = False
 last_cont = ()
 curr_cont = ()
 orig = False
-center = False
+centered = False
 
 def contours_obj(img_draw, mask):
 
@@ -86,13 +86,14 @@ while True:
         orig = cfu.check_orig(curr_cont, last_cont)
         print("in line")
         prev_obj_in_line = True
-        center = True
+        centered = True
         if(orig):
             print("orig, centering")
             last_cont = (cX, cY)
-    if(center and orig and (cX < conf.centerX + conf.tol) and (cX>conf.centerX-conf.tol) and (cY < conf.centerY + conf.tol) and (cY>conf.centerY-conf.tol)):
+    if(centered and orig and (cX < conf.centerX + conf.tol) and (cX>conf.centerX-conf.tol) and (cY < conf.centerY + conf.tol) and (cY>conf.centerY-conf.tol)):
             path, index = cfu.save_pic(index, frameOrig, r"C:\Users\david\Desktop\cvPics\img")
-            print(path)    
+            centered = False
+            print(path)
 
     cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2)
     try:
