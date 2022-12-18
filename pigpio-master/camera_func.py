@@ -1,11 +1,12 @@
 import cv2 as cv
 import numpy as np
 import config as conf
+from time import sleep
 
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
     if(last_cont == ()): return True
-    elif(cX <= last_cont[0] + 10 and  cX >= last_cont[0] - 10 and  cY <= last_cont[1] + 10 and cY >= last_cont[1] - 10):
+    elif(cX <= last_cont[0] + 20 and  cX >= last_cont[0] - 20 and  cY <= last_cont[1] + 20 and cY >= last_cont[1] - 20):
         return False
     else: return True
 
@@ -233,6 +234,7 @@ def contours_obj(img_draw, mask):
     return obj_angle, img_draw, cX, cY
 
 def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
+    sleep(0.08)
     cent_x = False
     cent_y = False
     if(obj_x > conf.centerX + conf.tol):
@@ -243,6 +245,7 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
           cent_x = False
     else:
         cent_x = True
+        
     if(obj_y > conf.centerY + conf.tol):
           servoY.setAngle(currAngleY - conf.step)
           cent_y = False
@@ -251,10 +254,13 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
           cent_y = False
     else:
         cent_y = True
+       
     if(cent_x and cent_y):
-        return True
+        servoX.stopServo()
+        servoY.stopServo()
+        return True, currAngleX, currAngleY
     else:
-        return False
+        return False, currAngleX, currAngleY
 
 def obj_mask(src, color):
 

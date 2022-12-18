@@ -4,6 +4,7 @@ import numpy as np
 import camera_func as cfu
 import config as conf
 import drive as dr
+from time import time
 
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
@@ -30,7 +31,9 @@ centered = False
 last_cont = ()
 curr_cont = ()
 orig = False
-
+save_last = True
+angleX = 0
+angleY = 0
 
 def res_servo(servoX, servoY):
     global selection
@@ -47,8 +50,8 @@ if not cap.isOpened():
 res_servo(servoX, servoY)
 
 while True:
-    print("centered: ")
-    print(centered)
+    #print("centered: ")
+    #print(orig)
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
     _, frameOrig = cap.read()
@@ -86,20 +89,34 @@ while True:
         print("cannot find object")
 
     if(obj_in_line == True and prev_obj_in_line == False):
+         
         orig = cfu.check_orig(curr_cont, last_cont)
         prev_obj_in_line = True
         print("in line")
-
-        if(orig):
-            print("orig, centering")
+        print(last_cont)
+        print(curr_cont)
+    
+    if(orig):
+        #print("orig, centering")
+        if(save_last):
             last_cont = (cX, cY)
-            centered = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
-            if (centered == True):
+            save_last = False
+            print("saved last cont")
+        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
+    if (centered and orig):
+                servoX.setAngle(angleX)
+                servoY.setAngle(angleY)
+                sleep(0.5)
                 path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
+                print(path)                    
+
+                res_servo(servoX, servoY)
                 obj_in_line = False
                 centered = False
-                res_servo(servoX, servoY)
-                print(path)
+                orig = False
+                save_last = True
+                
+            
     cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2) 
     try:
          cv.imshow("main", blurred)

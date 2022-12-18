@@ -50,7 +50,7 @@ class Servo():
         currAngle = self.currAngle
         return currAngle
     def stopServo(self):
-        sleep(0.2)
+        
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
 if __name__ == "__main__":
