@@ -1,5 +1,4 @@
 from time import sleep
-import time
 import cv2 as cv
 import numpy as np
 import camera_func as cfu
@@ -21,13 +20,19 @@ ret = None
 cX, cY = [0, 0]
 index = 0
 res = True
-last_time = 0
 try_line = True
 selection = conf.frame_select
 line_found = True
 line_count = 0
 obj_in_line = False
 prev_obj_in_line = False
+centered = False
+last_cont = ()
+curr_cont = ()
+orig = False
+save_last = True
+angleX = 0
+angleY = 0
 
 
 def search_seq(servoX, servoY, dire):
@@ -99,20 +104,14 @@ while True:
                 cY = int(M["m01"] / M["m00"])
                 string = str(cX) + " " + str(cY)
                 x,y,w,h = cv.boundingRect(contour)
-                if(w > conf.width/30) and (h > conf.height/30):
+                if(w > conf.width/20) and (h > conf.height/20):
                     color = (255, 0, 255)
                     obj_in_line = False
                     
                     if(y>= 0.66 * conf.height-10 and y<= 0.66 * conf.height+10):
                         color = (255, 255, 0)
                         obj_in_line = True
-                        if(prev_obj_in_line == False):
-                            prev_obj_in_line = True
-                            robot.stop()
-                            sleep(1)
-                            path, index = cfu.save_pic(index, image_draw, conf.path_pic_Pi)
-                            print(path)
-                            sleep(0.5)
+                        curr_cont = (cX, cY)                           
                             
                     else:
                         prev_obj_in_line = False
@@ -121,6 +120,33 @@ while True:
 
     except Exception as e:
         print("cannot find object")
+
+    if(obj_in_line == True and prev_obj_in_line == False):
+        robot.stop()
+        orig = cfu.check_orig(curr_cont, last_cont)
+        prev_obj_in_line = True
+        print("in line")
+        print(last_cont)
+        print(curr_cont)
+    
+    if(orig):
+        #print("orig, centering")
+        if(save_last):
+            last_cont = (cX, cY)
+            save_last = False
+            print("saved last cont")
+        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
+    if (centered and orig):
+                servoX.setAngle(angleX)
+                servoY.setAngle(angleY)
+                sleep(0.5)
+                path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
+                print(path)                    
+                res_servo(servoX, servoY)
+                obj_in_line = False
+                centered = False
+                orig = False
+                save_last = True
 
     dev, dire = cfu.deviance(angle)
 
@@ -131,8 +157,11 @@ while True:
             robot.moveR(conf.basePwm)
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
+    
+    cv.rectangle(image_draw, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2) 
     try:
-         cv.imshow("main", image_draw)
+
+        cv.imshow("main", image_draw)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
