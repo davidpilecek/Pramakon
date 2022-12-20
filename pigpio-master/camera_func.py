@@ -6,7 +6,7 @@ from time import sleep
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
     if(last_cont == ()): return True
-    elif(cX <= last_cont[0] + 20 and  cX >= last_cont[0] - 20 and  cY <= last_cont[1] + 20 and cY >= last_cont[1] - 20):
+    elif(cX <= last_cont[0] + 30 and  cX >= last_cont[0] - 30 and  cY <= last_cont[1] + 30 and cY >= last_cont[1] - 30):
         return False
     else: return True
 

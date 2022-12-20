@@ -6,6 +6,7 @@ import config as conf
 import drive as dr
 from time import time
 
+robot = dr.Robot(conf.leftMot, conf.rightMot)
 servoX = dr.Servo(conf.servoPinX)
 servoY = dr.Servo(conf.servoPinY)
 
@@ -34,21 +35,37 @@ orig = False
 save_last = True
 angleX = 0
 angleY = 0
+currAngleX = servoX.getAngle()
+currAngleY = servoY.getAngle()
+
 
 def res_servo(servoX, servoY):
     global selection
+    global robot
+    robot.stop()
     selection = conf.frame_select
-    servoX.setAngle(conf.servoX_pos)
-    servoY.setAngle(conf.servoY_pos)
+    while(servoX.getAngle() != conf.servoX_pos and servoY.getAngle() != conf.servoY_pos):
+        if(servoX.getAngle() > conf.servoX_pos):
+            sleep(0.01)
+            servoX.setAngle(servoX.getAngle() - conf.step)
+        if(servoX.getAngle() < conf.servoX_pos):
+            sleep(0.01)
+            servoX.setAngle(servoX.getAngle() + conf.step)
+        if(servoY.getAngle() > conf.servoY_pos):
+            sleep(0.01)
+            servoY.setAngle(servoY.getAngle() - conf.step)
+        if(servoY.getAngle() < conf.servoY_pos):
+            sleep(0.01)
+            servoY.setAngle(servoY.getAngle() + conf.step)
+    
     print("reset servo")
 
 image_draw = None
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
-
-res_servo(servoX, servoY)
-
+servoX.setAngle(conf.servoX_pos)
+servoY.setAngle(conf.servoY_pos)
 while True:
     #print("centered: ")
     #print(orig)
@@ -108,6 +125,7 @@ while True:
                 servoY.setAngle(angleY)
                 sleep(0.5)
                 path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
+                sleep(0.5)
                 print(path)                    
 
                 res_servo(servoX, servoY)

@@ -7,8 +7,8 @@ servoY_pos = 90
 frame_select= 55
 
 #PWM values
-pwmMin = 50
-pwmMax = 80
+pwmMin = 55
+pwmMax = 75
 frequency = 25
 
 #height and width of image
