@@ -3,8 +3,13 @@ import numpy as np
 import config as conf
 from time import sleep
 
-def check_orig(curr_cont, last_cont):
-    cX, cY = curr_cont[:2]
+def check_orig(curr_cont, last_cont, contour_ID):
+    try:
+        cX, cY = curr_cont[:2]
+    except Exception as e:
+        print(str(e))
+    print(cX)
+    print(cY)
     if(last_cont == ()): return True
     elif(cX <= last_cont[0] + 20 and  cX >= last_cont[0] - 20 and  cY <= last_cont[1] + 20 and cY >= last_cont[1] - 20):
         return False

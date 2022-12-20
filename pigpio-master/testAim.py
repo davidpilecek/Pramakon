@@ -37,6 +37,7 @@ angleX = 0
 angleY = 0
 currAngleX = servoX.getAngle()
 currAngleY = servoY.getAngle()
+contour_ID = 0
 
 
 def res_servo(servoX, servoY):
@@ -83,12 +84,12 @@ while True:
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
-        for contour in contours:
+        for contour_ID, contour in enumerate(contours):
             M = cv.moments(contour)
             if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
-                string = str(cX) + " " + str(cY)
+                string = str(cX) + " " + str(cY) + " " + contour_ID
                 x,y,w,h = cv.boundingRect(contour)
                 if(w > conf.width/20) and (h > conf.height/20):
                     obj_in_line = False

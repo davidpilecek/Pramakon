@@ -6,11 +6,11 @@ servoY_pos = 90
 
 frame_select= 55
 
-seek_line = 0.55
+seek_line = 0.66
 
 #PWM values
 pwmMin = 55
-pwmMax = 85
+pwmMax = 75
 frequency = 25
 
 #height and width of image
@@ -26,10 +26,10 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 path_pic = r"C:\Users\David\Desktop\cvPics\img"
 path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
 
-blue = np.array([[100,80,80], [135,255,255]])
+blue = np.array([[100,100,100], [135,255,255]])
 
 green = np.array([[45, 130, 90], [95, 255, 255]])
-tol = 10
+tol = 20
 
 ang_tol = 10
 
@@ -55,7 +55,7 @@ white_max=50
 if __name__ == "__main__":
     while True:
         image = np.zeros((500, 500, 3), np.uint8)
-        image[:] = (45, 110, 200)
+        image[:] = (100, 100, 100)
       
         im_conv = cv.cvtColor(image, cv.COLOR_HSV2BGR)
 
