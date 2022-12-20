@@ -2,22 +2,22 @@ import drive as dr
 import config as conf
 from time import sleep
 
-currAngle = 60
-
 servoX = dr.Servo(conf.servoPinX)
-servoX.setAngle(currAngle)
+servoX.setAngle(60)
 servoY = dr.Servo(conf.servoPinY)
-servoY.setAngle(currAngle)
+servoY.setAngle(90)
 
 sleep(1)
 
-while True:
-    print(currAngle)
-    if(currAngle >= 180):
-        servoX.stopServo()
-        servoY.stopServo()
-        break
-    servoX.setAngle(currAngle)
-    servoY.setAngle(currAngle)
-    currAngle +=1
-    sleep(0.02)
+def res_servo(servoX, servoY):
+   
+    if(servoX.getAngle() > conf.servoX_pos):
+        for j in range(servoX.getAngle()-conf.servoX_pos):
+            print(servoX.getAngle() - j)
+            sleep(0.02)
+    else:
+        for i in range(abs(servoX.getAngle()-conf.servoX_pos)):
+            print(servoX.getAngle() + i)
+            sleep(0.02)
+
+res_servo(servoX, servoY)

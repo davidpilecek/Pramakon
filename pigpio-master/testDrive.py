@@ -59,19 +59,18 @@ def res_servo(servoX, servoY):
     #servo_centered = False
     robot.stop()
     selection = conf.frame_select
-    while(servoX.getAngle() != conf.servoX_pos and servoY.getAngle() != conf.servoY_pos):
-        if(servoX.getAngle() > conf.servoX_pos):
-            sleep(0.01)
-            servoX.setAngle(servoX.getAngle() - conf.step)
-        if(servoX.getAngle() < conf.servoX_pos):
-            sleep(0.01)
-            servoX.setAngle(servoX.getAngle() + conf.step)
-        if(servoY.getAngle() > conf.servoY_pos):
-            sleep(0.01)
-            servoY.setAngle(servoY.getAngle() - conf.step)
-        if(servoY.getAngle() < conf.servoY_pos):
-            sleep(0.01)
-            servoY.setAngle(servoY.getAngle() + conf.step)
+
+    if(servoX.getAngle() > conf.servoX_pos):
+        for j in range(servoX.getAngle()-conf.servoX_pos):
+            print(servoX.getAngle() - j)
+            sleep(0.02)
+    else:
+        for i in range(abs(servoX.getAngle()-conf.servoX_pos)):
+            print(servoX.getAngle() + i)
+            sleep(0.02)
+
+
+
         
 image_draw = None
 
