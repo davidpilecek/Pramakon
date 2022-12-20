@@ -6,7 +6,7 @@ from time import sleep
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
     if(last_cont == ()): return True
-    elif(cX <= last_cont[0] + 30 and  cX >= last_cont[0] - 30 and  cY <= last_cont[1] + 30 and cY >= last_cont[1] - 30):
+    elif(cX <= last_cont[0] + 20 and  cX >= last_cont[0] - 20 and  cY <= last_cont[1] + 20 and cY >= last_cont[1] - 20):
         return False
     else: return True
 
@@ -233,8 +233,10 @@ def contours_obj(img_draw, mask):
 
     return obj_angle, img_draw, cX, cY
 
-def aim_camera_obj(servoX, servoY, obj_x, obj_y, currAngleX, currAngleY):
-    sleep(0.08)
+def aim_camera_obj(servoX, servoY, obj_x, obj_y):
+    currAngleX = servoX.getAngle()
+    currAngleY = servoY.getAngle()
+    sleep(0.1)
     cent_x = False
     cent_y = False
     if(obj_x > conf.centerX + conf.tol):
