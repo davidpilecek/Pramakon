@@ -4,6 +4,15 @@ import numpy as np
 import camera_func as cfu
 import config as conf
 import drive as dr
+from simple_pid import PID
+import matplotlib.pyplot as plt
+
+pid = PID(conf.p, conf.i, conf.d, setpoint = 90)
+pid.output_limits = (-45, 45)
+pid.sample_time = 0.01
+
+#angles_graph = []
+#devs_graph = []
 
 robot = dr.Robot(conf.leftMot, conf.rightMot)
 servoX = dr.Servo(conf.servoPinX)
@@ -33,7 +42,7 @@ angleX = 0
 angleY = 0
 servo_cent = False
 servo_reset = False
-index2 = 10
+curr_time = 0
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -45,11 +54,11 @@ def search_seq(servoX, servoY, dire):
     selection = conf.frame_select + 30
     if (dire == -1):
         print("looking right")
-        servoX.setAngle(conf.servoX_pos - 20)
+        servoX.setAngle(conf.servoX_pos - 40)
     elif(dire == 1):
         print("looking left")
-        servoX.setAngle(conf.servoX_pos + 20)
-    sleep(0.2)
+        servoX.setAngle(conf.servoX_pos + 40)
+    sleep(0.5)
     try_line = True
 
 def res_servo(servoX, servoY):
@@ -90,10 +99,11 @@ while True:
     
     currAngleX = round(servoX.getAngle())
     currAngleY = round(servoY.getAngle())
-   #print(currAngleX)
-   #print(currAngleY)
-    _, frameOrig = cap.read()
 
+    _, frameOrig = cap.read()
+    
+    p, i, d = pid.components
+    
     if(type(frameOrig) == type(None)):
         pass
     else:
@@ -132,7 +142,7 @@ while True:
         for contour in contours:
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
-            if(w > conf.width/20) and (h > conf.height/20):
+            if(w > conf.width/10) and (h > conf.height/10):
                 if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
@@ -150,6 +160,7 @@ while True:
                     cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
 
     except Exception as e:
+        res_servo(servoX, servoY)
         print("cannot find object")
 
     if(obj_in_line == True and prev_obj_in_line == False):
@@ -159,7 +170,7 @@ while True:
 
     if(orig):
         robot.stop()
-        #path, index2 = cfu.save_pic(index2, image_draw, conf.path_pic_Pi)
+        
         if(save_last):
             print(" ")
             print("last object: " + str(last_cont))
@@ -186,12 +197,27 @@ while True:
                 save_last = True
                 try_line = True
 
-    dev, dire = cfu.deviance(angle)
+    angle_pid, dire = cfu.deviance(angle)
+    
+    
+    #dev = angle_pid
+    dev = round(2*abs(pid(angle)))
+    
+    print("dev: " + str(dev))
+    print("angle: " + str(angle))
+    print("p: " + str(p))
+    print("i: " + str(i))
+    print("d: " + str(d))
+    print("      ")
+    
+    #angles_graph.append(angle)
+    #devs_graph.append(dev)
+    
     if ((dev + conf.basePwm) > conf.pwmMax):
             if dire == 1:
-                robot.moveL(conf.basePwm)
+                robot.moveL(conf.pwmMin)
             elif dire == -1:
-                robot.moveR(conf.basePwm)
+                robot.moveR(conf.pwmMin)
     else:
             cfu.steer(conf.basePwm, dev, dire, robot)
     
@@ -199,10 +225,9 @@ while True:
     cv.line(image_draw, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
     cv.line(image_draw, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
 
-    
     try:
-
         cv.imshow("main", image_draw)
+        #cv.imshow("original", frameOrig)
     except Exception as e:
         robot.stop()
     if cv.waitKey(1) == ord('q'):
@@ -213,3 +238,7 @@ servoY = dr.Servo(conf.servoPinY)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()
+#plt.plot(angles_graph, label = "angles")
+#plt.plot(devs_graph, label = "deviations")
+#plt.legend()
+#plt.show()

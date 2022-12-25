@@ -2,15 +2,20 @@ import numpy as np
 import cv2 as cv
 
 servoX_pos = 110
-servoY_pos = 90
+servoY_pos = 85
 
-frame_select= 55
+p=0.7
+i=0
+d=0.12
 
-seek_line = 0.55
+frame_select= 65
+
+#point of frame at which we seek the presence of object
+seek_line = 0.7
 
 #PWM values
-pwmMin = 55
-pwmMax = 85
+pwmMin = 52
+pwmMax = 70
 frequency = 25
 
 #height and width of image
@@ -26,7 +31,7 @@ pathPi = r"/home/pi/Desktop/video.mp4"
 path_pic = r"C:\Users\David\Desktop\cvPics\img"
 path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
 
-blue = np.array([[100,80,80], [135,255,255]])
+blue = np.array([[95,70,80], [135,255,255]])
 
 green = np.array([[45, 130, 90], [95, 255, 255]])
 tol = 10
@@ -53,10 +58,12 @@ white_min=20
 white_max=50
 
 if __name__ == "__main__":
+    color = (95,60,200)
+    print(color)
     while True:
         image = np.zeros((500, 500, 3), np.uint8)
-        image[:] = (45, 110, 200)
-      
+        image[:] = color
+        
         im_conv = cv.cvtColor(image, cv.COLOR_HSV2BGR)
 
         #cv.imshow("image", image)

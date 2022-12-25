@@ -12,17 +12,15 @@ prev_frame_time = 0
  
 # used to record the time at which we processed current frame
 new_frame_time = 0
-
-#cap.set(cv.CAP_PROP_FRAME_WIDTH, 150)
-#cap.set(cv.CAP_PROP_FRAME_HEIGHT, 200)
-
 fps_count = []
 
 while True:
 
     _, frame = cap.read()
 
-    
+    frame = cv.resize(frame, (200, 200))
+
+    frame_bw = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)    
 
     if(type(frame) == type(None) or _ == False):
         pass
@@ -45,10 +43,8 @@ while True:
     # by using putText function
     fps = str(fps)
  
-
-
     try:
-        cv.imshow("window", frame)
+        cv.imshow("window", frame_bw)
       
     except Exception as e:
         print(str(e))
