@@ -42,7 +42,12 @@ angleX = 0
 angleY = 0
 servo_cent = False
 servo_reset = False
+<<<<<<< HEAD
 curr_time = 0
+=======
+contour_ID = 0
+
+>>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -139,10 +144,17 @@ while True:
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
+<<<<<<< HEAD
         for contour in contours:
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
             if(w > conf.width/10) and (h > conf.height/10):
+=======
+        for contour_ID, contour in enumerate(contours):
+            x,y,w,h = cv.boundingRect(contour)  
+            if contour_ID == 0 and (w > conf.width/20) and (h > conf.height/20):
+                M = cv.moments(contour)
+>>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
                 if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])

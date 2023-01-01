@@ -1,5 +1,4 @@
 from time import sleep
-import time
 import cv2 as cv
 import numpy as np
 import camera_func as cfu
@@ -23,32 +22,15 @@ last_cont = ()
 curr_cont = ()
 orig = False
 centered = False
-
-def contours_obj(img_draw, mask):
-
-    contours, hierarchy = cv.findContours(mask, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-
-    for contour in contours:
-        x,y,w,h = cv.boundingRect(contour)
-        if(w > conf.width/15) and (h > conf.height/15):
-            cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
-    
-    for contour in contours:
-        M = cv.moments(contour)
-        if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-            string = str(cX) + " " + str(cY)
-            cv.putText(img_draw, string, (cX, cY), cv.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 255) )
-    
-    return img_draw, cX, cY
+contour_ID = 0
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 while True:
     _, frameOrig = cap.read()
-    print(orig)
+    
+
     if(type(frameOrig) == type(None)):
         pass
     else:
@@ -58,44 +40,51 @@ while True:
         
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-        
-        for contour in contours:
-            M = cv.moments(contour)
-            if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                string = str(cX) + " " + str(cY)
-                x,y,w,h = cv.boundingRect(contour)
-                if(w > conf.width/20) and (h > conf.height/20):
+        for contour_ID, contour in enumerate(contours):
+            
+            x,y,w,h = cv.boundingRect(contour)  
+            if contour_ID == 0 and (w > conf.width/20) and (h > conf.height/20):
+                M = cv.moments(contour)
+                if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
+                    string = str(cX) + " " + str(cY) + " " + str(contour_ID)
                     color = (255, 0, 255)
+                    curr_cont = np.append(curr_cont, (cX, cY))
                     obj_in_line = False
-                    
-                    if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
+                    #print("current contour list: " + str(curr_cont))
+                    if(contour_ID == 0 and cY>= conf.seek_line * conf.height-20 and cY<= conf.seek_line * conf.height+20):
                         color = (255, 255, 0)
                         obj_in_line = True
-                        curr_cont = (cX, cY) 
                     else:
                         prev_obj_in_line = False
+                    cv.circle(blurred, (cX, cY), 3, (0, 0, 0), -1)
                     cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
                     cv.putText(blurred, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
 
     except Exception as e:
-        print("cannot find object")
+        print(str(e))
     
     if(obj_in_line == True and prev_obj_in_line == False):
-        orig = cfu.check_orig(curr_cont, last_cont)
+        print("inl")
+        print(contour_ID)
+        orig = cfu.check_orig(curr_cont, last_cont, contour_ID)
         print("in line")
         prev_obj_in_line = True
         centered = True
         if(orig):
             print("orig, centering")
             last_cont = (cX, cY)
+
     if(centered and orig and (cX < conf.centerX + conf.tol) and (cX>conf.centerX-conf.tol) and (cY < conf.centerY + conf.tol) and (cY>conf.centerY-conf.tol)):
             path, index = cfu.save_pic(index, frameOrig, r"C:\Users\david\Desktop\cvPics\img")
             centered = False
             print(path)
 
     cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2)
+    cv.line(image_draw, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
+    cv.line(image_draw, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
+
     try:
         cv.imshow("main", blurred)
         cv.imshow("mask", mask_obj)

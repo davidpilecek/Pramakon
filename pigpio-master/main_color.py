@@ -134,8 +134,59 @@ while True:
          sleep(0.5)
          servoX.setAngle(conf.servoX_pos)
          servoY.setAngle(conf.servoY_pos)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
 
+    try:
+        contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
+
+        for contour in contours:
+            x,y,w,h = cv.boundingRect(contour)
+            M = cv.moments(contour)
+            if(w > conf.width/10) and (h > conf.height/10):
+                if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
+                    string = str(cX) + " " + str(cY)
+                    color = (255, 0, 255)
+                    obj_in_line = False
+                    if(cY>= conf.seek_line * conf.height-20 and cY<= conf.seek_line * conf.height+20):
+                        color = (255, 255, 0)
+                        obj_in_line = True
+                        curr_cont = (cX, cY)                           
+                            
+                    else:
+                        prev_obj_in_line = False
+                    cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
+                    cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
+
+<<<<<<< HEAD
+    except Exception as e:
+        res_servo(servoX, servoY)
+        print("cannot find object")
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
+
+    if len(contours) == 0:
+        res_servo(servoX, servoY)
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
+
+    if(obj_in_line == True and prev_obj_in_line == False):
+        print("in line")
+        orig = cfu.check_orig(curr_cont, last_cont)
+        prev_obj_in_line = True
+
+    if(orig):
+        robot.stop()
+
+=======
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
@@ -162,17 +213,6 @@ while True:
     except Exception as e:
         res_servo(servoX, servoY)
         print("cannot find object")
-        obj_in_line = False
-        orig = False
-        centered = False
-        try_line = True
-
-    if len(contours) == 0:
-        res_servo(servoX, servoY)
-        obj_in_line = False
-        orig = False
-        centered = False
-        try_line = True
 
     if(obj_in_line == True and prev_obj_in_line == False):
         print("in line")
@@ -181,7 +221,8 @@ while True:
 
     if(orig):
         robot.stop()
-
+        
+>>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
         if(save_last):
             print(" ")
             print("last object: " + str(last_cont))
@@ -252,4 +293,8 @@ cv.destroyAllWindows()
 #plt.plot(angles_graph, label = "angles")
 #plt.plot(devs_graph, label = "deviations")
 #plt.legend()
+<<<<<<< HEAD
 #plt.show()
+=======
+#plt.show()
+>>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
