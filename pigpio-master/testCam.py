@@ -18,9 +18,9 @@ while True:
 
     _, frame = cap.read()
 
-    frame = cv.resize(frame, (200, 200))
+    #frame = cv.resize(frame, (200, 200))
 
-    frame_bw = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)    
+    #frame_bw = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)    
 
     if(type(frame) == type(None) or _ == False):
         pass
@@ -44,7 +44,7 @@ while True:
     fps = str(fps)
  
     try:
-        cv.imshow("window", frame_bw)
+        cv.imshow("window", frame)
       
     except Exception as e:
         print(str(e))

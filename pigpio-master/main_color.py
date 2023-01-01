@@ -162,6 +162,17 @@ while True:
     except Exception as e:
         res_servo(servoX, servoY)
         print("cannot find object")
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
+
+    if len(contours) == 0:
+        res_servo(servoX, servoY)
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
 
     if(obj_in_line == True and prev_obj_in_line == False):
         print("in line")
@@ -170,7 +181,7 @@ while True:
 
     if(orig):
         robot.stop()
-        
+
         if(save_last):
             print(" ")
             print("last object: " + str(last_cont))
