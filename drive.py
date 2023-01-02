@@ -13,8 +13,8 @@ class Robot():
         self.rightMot = rightMot
         self.pi.set_mode(self.leftMot, pigpio.OUTPUT)
         self.pi.set_mode(self.rightMot, pigpio.OUTPUT)
-        self.pi.set_PWM_frequency(self.leftMot, conf.frequency)
-        self.pi.set_PWM_frequency(self.rightMot, conf.frequency)
+        self.pi.set_PWM_frequency(self.leftMot, PWM_FREQUENCY)
+        self.pi.set_PWM_frequency(self.rightMot, PWM_FREQUENCY)
         self.pi.set_PWM_range(self.leftMot, 100)
         self.pi.set_PWM_range(self.rightMot, 100)
     def straight(self, speed):
@@ -52,12 +52,9 @@ class Servo():
         return currAngle
 
     def reset(self, servo, servo_pos):
-        global selection
-        global robot
         self.servo_pos = servo_pos
         self.curr = round(servo.getAngle())
-        robot.stop()
-        selection = FRAME_SELECT
+
         if(self.curr > self.servo_pos):
             for j in range(self.curr-self.servo_pos):
                 servo.setAngle(self.curr - j)

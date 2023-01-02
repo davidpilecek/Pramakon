@@ -27,7 +27,7 @@ def contours_line(image_draw, mask, height, width):
     vy = float(vy)
     vx = float(vx)
 
-    #cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
+    cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
 
     if 0<vy<1:
         ang_vector = np.degrees(np.arctan(vy/vx))
@@ -61,7 +61,7 @@ def contours_line(image_draw, mask, height, width):
 
     average_angle = round(average_angle)
 
-    #cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
+    cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
     return average_angle, image_draw
 
