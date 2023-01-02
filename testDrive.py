@@ -1,3 +1,5 @@
+#try to stop servo after it's been aimed at object
+
 from time import sleep
 import cv2 as cv
 import numpy as np
@@ -33,21 +35,15 @@ line_found = True
 line_count = 0
 obj_in_line = False
 prev_obj_in_line = False
+obj_in_frame = False
 centered = False
-last_cont = ()
-curr_cont = ()
 orig = False
-save_last = True
 angleX = 0
 angleY = 0
 servo_cent = False
 servo_reset = False
-<<<<<<< HEAD
 curr_time = 0
-=======
-contour_ID = 0
 
->>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -101,7 +97,6 @@ servoX.setAngle(conf.servoX_pos)
 servoY.setAngle(conf.servoY_pos)
 
 while True:
-    
     currAngleX = round(servoX.getAngle())
     currAngleY = round(servoY.getAngle())
 
@@ -131,7 +126,6 @@ while True:
             servoX.setAngle(conf.servoX_pos)
             servoY.setAngle(conf.servoY_pos)
 
-            
     if (line_found == False  and try_line == True):
          if(line_count > 1):
              try_line = False
@@ -140,21 +134,13 @@ while True:
          servoX.setAngle(conf.servoX_pos)
          servoY.setAngle(conf.servoY_pos)
 
-
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
-<<<<<<< HEAD
         for contour in contours:
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
             if(w > conf.width/10) and (h > conf.height/10):
-=======
-        for contour_ID, contour in enumerate(contours):
-            x,y,w,h = cv.boundingRect(contour)  
-            if contour_ID == 0 and (w > conf.width/20) and (h > conf.height/20):
-                M = cv.moments(contour)
->>>>>>> 476e45d73054d92e089dd017875829bad7c28f86
                 if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
@@ -175,23 +161,12 @@ while True:
         res_servo(servoX, servoY)
         print("cannot find object")
 
-    if(obj_in_line == True and prev_obj_in_line == False):
+    if(obj_in_line and prev_obj_in_line == False and obj_in_frame):
         print("in line")
-        orig = cfu.check_orig(curr_cont, last_cont)
         prev_obj_in_line = True
-
-    if(orig):
         robot.stop()
-        
-        if(save_last):
-            print(" ")
-            print("last object: " + str(last_cont))
-            print("current object: " + str(curr_cont))
-            last_cont = (cX, cY)
-            save_last = False
-            print("saved current cont")
         centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
-        
+
     if (centered):
                 try_line = False
                 print("saving pic")
@@ -206,21 +181,18 @@ while True:
                 obj_in_line = False
                 centered = False
                 orig = False
-                save_last = True
                 try_line = True
 
-    angle_pid, dire = cfu.deviance(angle)
-    
-    
-    #dev = angle_pid
+    _, dire = cfu.deviation(angle)
+
     dev = round(2*abs(pid(angle)))
     
-    print("dev: " + str(dev))
-    print("angle: " + str(angle))
-    print("p: " + str(p))
-    print("i: " + str(i))
-    print("d: " + str(d))
-    print("      ")
+    #print("dev: " + str(dev))
+    #print("angle: " + str(angle))
+    #print("p: " + str(p))
+    #print("i: " + str(i))
+    #print("d: " + str(d))
+    #print("      ")
     
     #angles_graph.append(angle)
     #devs_graph.append(dev)
