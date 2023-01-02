@@ -7,7 +7,6 @@ from drive import *
 from simple_pid import PID
 from logger import Logger
 
-
 logger = Logger()
 pid = PID(KP, KI, KD, setpoint = 90)
 pid.output_limits = (-45, 45)
@@ -49,14 +48,14 @@ def search_seq(servoX, servoY, dire):
     global try_line
     global line_count
     line_count = 0
-    print("setting servos")
+    logger.log.info(f"searching for track")
     servoY.setAngle(SERVOY_POS + 20)
     selection = FRAME_SELECT + 30
     if (dire == -1):
-        print("looking right")
+        logger.log.info(f"looking right")
         servoX.setAngle(SERVOX_POS - 40)
     elif(dire == 1):
-        print("looking left")
+        logger.log.info(f"looking left")
         servoX.setAngle(SERVOX_POS + 40)
     sleep(0.5)
     try_line = True
@@ -69,7 +68,6 @@ if not cap.isOpened():
 
 while True:
     _, frameOrig = cap.read()
-    
     #p, i, d = pid.components
     
     if(type(frameOrig) == type(None)):
@@ -138,13 +136,14 @@ while True:
     if len(contours) == 0:
         servoX.reset(servoX, SERVOX_POS)
         servoY.reset(servoY, SERVOY_POS)
+        logger.log.warning(f"object not found")
         obj_in_line = False
         orig = False
         centered = False
         try_line = True
 
     if(obj_in_line == True and prev_obj_in_line == False):
-        print("in line")
+        logger.log.info(f"object is in line")
         orig = cfu.check_orig(curr_cont, last_cont)
         prev_obj_in_line = True
 
@@ -152,9 +151,8 @@ while True:
         robot.stop()
         
         if(save_last):
-            print(" ")
             print(f"last object: {last_cont}")
-            print(f"current object: " + str(curr_cont))
+            print(f"current object: {curr_cont}")
             last_cont = (cX, cY)
             save_last = False
             logger.log.warning(f"saved current contour")

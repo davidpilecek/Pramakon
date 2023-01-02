@@ -11,12 +11,11 @@ def check_orig(curr_cont, last_cont):
     else: return True
 
 def contours_line(image_draw, mask, height, width):
-
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
     contour = max(contours, key = cv.contourArea, default=0)
 
-    cv.drawContours(image_draw, contour, -1, (0, 255, 0), 5)
+    cv.drawContours(image_draw, [contour], -1, (0, 255, 0), -1)
 
     height, width = image_draw.shape[:2]
 
@@ -28,7 +27,7 @@ def contours_line(image_draw, mask, height, width):
     vy = float(vy)
     vx = float(vx)
 
-    cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
+    #cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
 
     if 0<vy<1:
         ang_vector = np.degrees(np.arctan(vy/vx))
@@ -62,7 +61,7 @@ def contours_line(image_draw, mask, height, width):
 
     average_angle = round(average_angle)
 
-    cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
+    #cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
 
     return average_angle, image_draw
 
@@ -80,8 +79,6 @@ def crop_img_line_color(img, height, width, color, sel):
 
     match_mask_color = [255,255,255]
 
-    area = round((height - height_1) * width)
-
     #create pure white frame in area of interest
     cv.fillPoly(mask_black, vertices, match_mask_color)
 
@@ -90,7 +87,7 @@ def crop_img_line_color(img, height, width, color, sel):
     
     mask = cv.inRange(masked_image, color[0], color[1])
 
-    return mask, area
+    return mask
 
 def prep_pic(src):
     frame = cv.resize(src, (conf.HEIGHT_OF_IMAGE, conf.WIDTH_OF_IMAGE))
@@ -202,13 +199,6 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y):
     else:
         return False, currAngleX, currAngleY
 
-def obj_mask(src, color):
-
-    hsvImg = cv.cvtColor(src, cv.COLOR_BGR2HSV)
-
-    mask = cv.inRange(hsvImg, color[0], color[1])
-
-    return mask
 
 def crop_img_obj(img, w, h):
 

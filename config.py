@@ -10,10 +10,10 @@ KP=0.7
 KI=0
 KD=0.12
 
-FRAME_SELECT= 65
+FRAME_SELECT= 50
 
 #point of frame at which we seek the presence of object
-SEEK_LINE = 0.7
+SEEK_OBJECT = 0.7
 
 #PWM values
 PWM_MIN = 52
@@ -21,8 +21,8 @@ PWM_MAX = 70
 PWM_FREQUENCY = 25
 
 #height and width of image
-HEIGHT_OF_IMAGE = 200
-WIDTH_OF_IMAGE = 200
+HEIGHT_OF_IMAGE = 500
+WIDTH_OF_IMAGE = 500
 
 CENTER_Y = round(HEIGHT_OF_IMAGE / 2)
 CENTER_X = round(WIDTH_OF_IMAGE / 2)
@@ -30,8 +30,8 @@ CENTER_X = round(WIDTH_OF_IMAGE / 2)
 PATH_PIC = r"C:\Users\David\Desktop\cvPics\img"
 PATH_PIC_PI = r"/home/pi/Desktop/cvPics/img"
 
-BLUE_HSV_RANGE = np.array([[95,70,80], [135,255,255]])
-GREEN_HSV_RANGE = np.array([[40, 80, 90], [95, 255, 255]])
+BLUE_HSV_RANGE = np.array([[95,55,35], [135,255,255]])
+GREEN_HSV_RANGE = np.array([[40, 50, 23], [94, 255, 255]])
 
 CENTER_TOLERANCE = 10
 
@@ -48,7 +48,7 @@ Y_SERVO_PIN = 18
 BASE_PWM = (PWM_MIN + PWM_MAX) / 2
 
 if __name__ == "__main__":
-    color = (40, 80, 90)
+    color = (40, 50, 50)
     print(color)
     while True:
         image = np.zeros((500, 500, 3), np.uint8)

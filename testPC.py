@@ -2,9 +2,9 @@ from time import sleep
 import cv2 as cv
 import numpy as np
 import camera_func as cfu
-import config as conf
+from config import *
 
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(1)
 
 dire = 0
 frame_draw = []
@@ -13,7 +13,7 @@ ret = None
 cX, cY = [0, 0]
 index = 0
 res = True
-selection = conf.frame_select
+selection = FRAME_SELECT
 line_count = 0
 image_draw = None
 obj_in_line = False
@@ -29,65 +29,71 @@ if not cap.isOpened():
 
 while True:
     _, frameOrig = cap.read()
-    
+    image_draw = cv.resize(frameOrig, (HEIGHT_OF_IMAGE, WIDTH_OF_IMAGE))
 
     if(type(frameOrig) == type(None)):
         pass
     else:
-        blurred, height, width = cfu.prep_pic(frameOrig)
-        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
-        mask_obj = cfu.obj_mask(blurred, conf.green)
-        
-    try:
-        contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-        for contour_ID, contour in enumerate(contours):
-            
-            x,y,w,h = cv.boundingRect(contour)  
-            if contour_ID == 0 and (w > conf.width/20) and (h > conf.height/20):
-                M = cv.moments(contour)
-                if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
-                    cX = int(M["m10"] / M["m00"])
-                    cY = int(M["m01"] / M["m00"])
-                    string = str(cX) + " " + str(cY) + " " + str(contour_ID)
-                    color = (255, 0, 255)
-                    curr_cont = np.append(curr_cont, (cX, cY))
-                    obj_in_line = False
-                    #print("current contour list: " + str(curr_cont))
-                    if(contour_ID == 0 and cY>= conf.seek_line * conf.height-20 and cY<= conf.seek_line * conf.height+20):
-                        color = (255, 255, 0)
-                        obj_in_line = True
-                    else:
-                        prev_obj_in_line = False
-                    cv.circle(blurred, (cX, cY), 3, (0, 0, 0), -1)
-                    cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
-                    cv.putText(blurred, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
+        img_hsv, height, width = cfu.prep_pic(frameOrig)
+        mask = cfu.crop_img_line_color(img_hsv, HEIGHT_OF_IMAGE, WIDTH_OF_IMAGE, BLUE_HSV_RANGE, FRAME_SELECT)
+        contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
-    except Exception as e:
-        print(str(e))
+    contour = max(contours, key = cv.contourArea, default=0)
+    try:
+        cv.drawContours(image_draw, [contour], -1, (0, 255, 0), -1)
+        [vx,vy,x,y] = cv.fitLine(contour, cv.DIST_L2,0,0.01,0.01)
     
-    if(obj_in_line == True and prev_obj_in_line == False):
-        print("inl")
-        print(contour_ID)
-        orig = cfu.check_orig(curr_cont, last_cont)
-        print("in line")
-        prev_obj_in_line = True
-        centered = True
-        if(orig):
-            print("orig, centering")
-            last_cont = (cX, cY)
+        lefty = int((-x*vy/vx) + y)
+        righty = int(((height-x)*vy/vx)+y)
 
-    if(centered and orig and (cX < conf.centerX + conf.tol) and (cX>conf.centerX-conf.tol) and (cY < conf.centerY + conf.tol) and (cY>conf.centerY-conf.tol)):
-            path, index = cfu.save_pic(index, frameOrig, r"C:\Users\david\Desktop\cvPics\img")
-            centered = False
-            print(path)
+        vy = float(vy)
+        vx = float(vx)
 
-    cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2)
-    cv.line(blurred, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
-    cv.line(blurred, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
+        cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
+
+        if 0<vy<1:
+            ang_vector = np.degrees(np.arctan(vy/vx))
+
+        elif -1<vy<0:
+            ang_vector = 180 - np.degrees(np.arctan(np.abs(vy)/vx))
+
+        else:
+            ang_vector = 90
+
+        if len(contours)>0:
+            M = cv.moments(contour)
+            if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+        else:
+            pass
+
+        cv.circle(image_draw, (cX, cY), 10, (0, 0, 0), -1)
+
+        if cX > int(width / 2):
+             x_pos = 180 - np.degrees(np.arctan((height - cY) / (cX - int(width / 2))))
+
+        elif cX < int(width / 2):
+             x_pos = np.degrees(np.arctan((height - cY) / (int(width / 2) - cX )))
+        else:
+            cX, cY = [0, 0]
+            x_pos = 90
+
+        average_angle = (ang_vector*0.35 + x_pos*0.65)
+
+        average_angle = round(average_angle)
+
+        cv.putText(image_draw, str(round(average_angle)),(50, 50), cv.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
+    except:
+        print(f"noroad")
+    height, width = image_draw.shape[:2]
+
+    
 
     try:
-        cv.imshow("main", blurred)
-        cv.imshow("mask", mask_obj)
+        cv.imshow("main", frameOrig)
+        cv.imshow("mask",image_draw)
+
     except Exception as e:
         print(str(e))
     if cv.waitKey(1) == ord('q'):
