@@ -93,7 +93,7 @@ def crop_img_line_color(img, height, width, color, sel):
     return mask, area
 
 def prep_pic(src):
-    frame = cv.resize(src, (conf.height, conf.width))
+    frame = cv.resize(src, (conf.HEIGHT_OF_IMAGE, conf.WIDTH_OF_IMAGE))
     height, width = frame.shape[:2]
 
     blurred = cv.GaussianBlur(frame, (7, 7), 0)
@@ -147,7 +147,7 @@ def contours_obj(img_draw, mask):
 
     for contour in contours:
         x,y,w,h = cv.boundingRect(contour)
-        if(w > conf.width/20) and (h > conf.height/20):
+        if(w > conf.WIDTH_OF_IMAGE/20) and (h > conf.HEIGHT_OF_IMAGE/20):
             cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
 
     if len(contours)>0:
@@ -158,11 +158,11 @@ def contours_obj(img_draw, mask):
     else:
         pass
     cv.circle(img_draw, (cX, cY), 5, (255, 0, 255), -1)
-    if cX > int(conf.width / 2):
-             obj_angle = 180 - np.degrees(np.arctan((conf.height - cY) / (cX - int(conf.width / 2))))
+    if cX > int(conf.WIDTH_OF_IMAGE / 2):
+             obj_angle = 180 - np.degrees(np.arctan((conf.HEIGHT_OF_IMAGE - cY) / (cX - int(conf.WIDTH_OF_IMAGE / 2))))
 
-    elif cX < int(conf.width / 2):
-             obj_angle = np.degrees(np.arctan((conf.height - cY) / (int(conf.width / 2) - cX )))
+    elif cX < int(conf.WIDTH_OF_IMAGE / 2):
+             obj_angle = np.degrees(np.arctan((conf.HEIGHT_OF_IMAGE - cY) / (int(conf.WIDTH_OF_IMAGE / 2) - cX )))
     else:
          cX, cY = [0, 0]
          obj_angle = 90
@@ -177,20 +177,20 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y):
     sleep(0.1)
     cent_x = False
     cent_y = False
-    if(obj_x > conf.centerX + conf.tol):
-          servoX.setAngle(currAngleX - conf.step)
+    if(obj_x > conf.CENTER_X + conf.CENTER_TOLERANCE):
+          servoX.setAngle(currAngleX - conf.SERVO_STEP)
           cent_x = False
-    elif(obj_x < conf.centerX - conf.tol):
-          servoX.setAngle(currAngleX + conf.step)
+    elif(obj_x < conf.CENTER_X - conf.CENTER_TOLERANCE):
+          servoX.setAngle(currAngleX + conf.SERVO_STEP)
           cent_x = False
     else:
         cent_x = True
         
-    if(obj_y > conf.centerY + conf.tol):
-          servoY.setAngle(currAngleY - conf.step)
+    if(obj_y > conf.CENTER_Y + conf.CENTER_TOLERANCE):
+          servoY.setAngle(currAngleY - conf.SERVO_STEP)
           cent_y = False
-    elif(obj_y < conf.centerY - conf.tol):
-          servoY.setAngle(currAngleY + conf.step)
+    elif(obj_y < conf.CENTER_Y - conf.CENTER_TOLERANCE):
+          servoY.setAngle(currAngleY + conf.SERVO_STEP)
           cent_y = False
     else:
         cent_y = True

@@ -3,49 +3,49 @@ import cv2 as cv
 
 DEBUG = 1
 
-servoX_pos = 110
-servoY_pos = 85
+SERVOX_POS = 110
+SERVOY_POS = 85
 
-p=0.7
-i=0
-d=0.12
+KP=0.7
+KI=0
+KD=0.12
 
-frame_select= 65
+FRAME_SELECT= 65
 
 #point of frame at which we seek the presence of object
-seek_line = 0.7
+SEEK_LINE = 0.7
 
 #PWM values
-pwmMin = 52
-pwmMax = 70
-frequency = 25
+PWM_MIN = 52
+PWM_MAX = 70
+PWM_FREQUENCY = 25
 
 #height and width of image
-height = 200
-width = 200
+HEIGHT_OF_IMAGE = 200
+WIDTH_OF_IMAGE = 200
 
-centerY = round(height / 2)
-centerX = round(width / 2)
+CENTER_Y = round(HEIGHT_OF_IMAGE / 2)
+CENTER_X = round(WIDTH_OF_IMAGE / 2)
 
-path_pic = r"C:\Users\David\Desktop\cvPics\img"
-path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
+PATH_PIC = r"C:\Users\David\Desktop\cvPics\img"
+PATH_PIC_PI = r"/home/pi/Desktop/cvPics/img"
 
-blue = np.array([[95,70,80], [135,255,255]])
-green = np.array([[40, 80, 90], [95, 255, 255]])
+BLUE_HSV_RANGE = np.array([[95,70,80], [135,255,255]])
+GREEN_HSV_RANGE = np.array([[40, 80, 90], [95, 255, 255]])
 
-tol = 10
+CENTER_TOLERANCE = 10
 
-ang_tol = 10
+ANGLE_TOLERANCE = 10
 
-step = 1
+SERVO_STEP = 1
 
 #RPi pin config
-leftMot = 19
-rightMot = 13
-servoPinX = 12
-servoPinY = 18
+LEFT_MOTOR_PIN = 19
+RIGHT_MOTOR_PIN = 13
+X_SERVO_PIN = 12
+Y_SERVO_PIN = 18
 
-basePwm = (pwmMin + pwmMax) / 2
+BASE_PWM = (PWM_MIN + PWM_MAX) / 2
 
 if __name__ == "__main__":
     color = (40, 80, 90)

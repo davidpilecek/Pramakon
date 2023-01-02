@@ -2,20 +2,20 @@ from time import sleep
 import cv2 as cv
 import numpy as np
 import camera_func as cfu
-import config as conf
-import drive as dr
+from config import *
+from drive import *
 from simple_pid import PID
 from logger import Logger
 
 
 logger = Logger()
-pid = PID(conf.p, conf.i, conf.d, setpoint = 90)
+pid = PID(KP, KI, KD, setpoint = 90)
 pid.output_limits = (-45, 45)
 pid.sample_time = 0.01
 
-robot = dr.Robot(conf.leftMot, conf.rightMot)
-servoX = dr.Servo(conf.servoPinX)
-servoY = dr.Servo(conf.servoPinY)
+robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
+servoX = Servo(X_SERVO_PIN)
+servoY = Servo(Y_SERVO_PIN)
 
 cap = cv.VideoCapture(0)
 
@@ -27,7 +27,7 @@ cX, cY = [0, 0]
 index = 0
 res = True
 try_line = True
-selection = conf.frame_select
+selection = FRAME_SELECT
 line_found = True
 line_count = 0
 obj_in_line = False
@@ -50,64 +50,34 @@ def search_seq(servoX, servoY, dire):
     global line_count
     line_count = 0
     print("setting servos")
-    servoY.setAngle(conf.servoY_pos + 20)
-    selection = conf.frame_select + 30
+    servoY.setAngle(SERVOY_POS + 20)
+    selection = FRAME_SELECT + 30
     if (dire == -1):
         print("looking right")
-        servoX.setAngle(conf.servoX_pos - 40)
+        servoX.setAngle(SERVOX_POS - 40)
     elif(dire == 1):
         print("looking left")
-        servoX.setAngle(conf.servoX_pos + 40)
+        servoX.setAngle(SERVOX_POS + 40)
     sleep(0.5)
     try_line = True
 
-def res_servo(servoX, servoY):
-    global selection
-    global robot
-    currX = round(servoX.getAngle())
-    currY = round(servoY.getAngle())
-    robot.stop()
-    selection = conf.frame_select
-
-    if(currX > conf.servoX_pos):
-        for j in range(currX-conf.servoX_pos):
-            servoX.setAngle(currX - j)
-            sleep(0.02)
-    else:
-        for i in range(abs(currX-conf.servoX_pos)):
-            servoX.setAngle(currX + i)
-            sleep(0.02)
-            
-    if(currY > conf.servoY_pos):
-        for j in range(currY-conf.servoY_pos):
-            servoY.setAngle(currY - j)
-            sleep(0.02)
-    else:
-        for i in range(abs(currY-conf.servoY_pos)):
-            servoY.setAngle(currY + i)
-            sleep(0.02)
+servoX.setAngle(SERVOX_POS)
+servoY.setAngle(SERVOY_POS)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
-servoX.setAngle(conf.servoX_pos)
-servoY.setAngle(conf.servoY_pos)
-
 while True:
-    
-    currAngleX = round(servoX.getAngle())
-    currAngleY = round(servoY.getAngle())
-
     _, frameOrig = cap.read()
     
-    p, i, d = pid.components
+    #p, i, d = pid.components
     
     if(type(frameOrig) == type(None)):
         pass
     else:
         img_hsv, height, width = cfu.prep_pic(frameOrig)
-        ret, area = cfu.crop_img_line_color(img_hsv, height, width, conf.blue, selection)
-        mask_obj = cfu.obj_mask(img_hsv, conf.green)
+        ret, area = cfu.crop_img_line_color(img_hsv, height, width, BLUE_HSV_RANGE, selection)
+        mask_obj = cfu.obj_mask(img_hsv, GREEN_HSV_RANGE)
   
     if(try_line == False):
         image_draw = img_hsv
@@ -121,16 +91,16 @@ while True:
             line_count += 1
         except Exception as e:
             line_found = False
-            servoX.setAngle(conf.servoX_pos)
-            servoY.setAngle(conf.servoY_pos)
+            servoX.setAngle(SERVOX_POS)
+            servoY.setAngle(SERVOY_POS)
 
     if (line_found == False  and try_line == True):
          if(line_count > 1):
              try_line = False
              search_seq(servoX, servoY, dire)
          sleep(0.5)
-         servoX.setAngle(conf.servoX_pos)
-         servoY.setAngle(conf.servoY_pos)
+         servoX.setAngle(SERVOX_POS)
+         servoY.setAngle(SERVOY_POS)
 
 
     try:
@@ -139,14 +109,14 @@ while True:
         for contour in contours:
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
-            if(w > conf.width/10) and (h > conf.height/10):
+            if(w > WIDTH_OF_IMAGE/10) and (h > HEIGHT_OF_IMAGE/10):
                 if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
                     string = str(cX) + " " + str(cY)
                     color = (255, 0, 255)
                     obj_in_line = False
-                    if(cY>= conf.seek_line * conf.height-20 and cY<= conf.seek_line * conf.height+20):
+                    if(cY>= SEEK_LINE * HEIGHT_OF_IMAGE-20 and cY<= SEEK_LINE * HEIGHT_OF_IMAGE+20):
                         color = (255, 255, 0)
                         obj_in_line = True
                         curr_cont = (cX, cY)                           
@@ -157,7 +127,8 @@ while True:
                     cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
 
     except Exception as e:
-        res_servo(servoX, servoY)
+        servoX.reset(servoX, SERVOX_POS)
+        servoY.reset(servoY, SERVOY_POS)
         logger.log.warning(f"object not found")
         obj_in_line = False
         orig = False
@@ -165,7 +136,8 @@ while True:
         try_line = True
         
     if len(contours) == 0:
-        res_servo(servoX, servoY)
+        servoX.reset(servoX, SERVOX_POS)
+        servoY.reset(servoY, SERVOY_POS)
         obj_in_line = False
         orig = False
         centered = False
@@ -195,31 +167,32 @@ while True:
                 servoX.setAngle(angleX)
                 servoY.setAngle(angleY)
                 sleep(0.5)
-                path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
+                path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PI)
                 print(path)
                 sleep(0.5)                               
-                res_servo(servoX, servoY)
+                servoX.reset(servoX, SERVOX_POS)
+                servoY.reset(servoY, SERVOY_POS)
                 obj_in_line = False
                 centered = False
                 orig = False
                 save_last = True
                 try_line = True
 
-    angle_pid, dire = cfu.deviance(angle)
+    _, dire = cfu.deviation(angle)
     
     dev = round(2*abs(pid(angle)))
     
-    if ((dev + conf.basePwm) > conf.pwmMax):
+    if ((dev + BASE_PWM) > PWM_MAX):
             if dire == 1:
-                robot.moveL(conf.pwmMin)
+                robot.moveL(PWM_MIN)
             elif dire == -1:
-                robot.moveR(conf.pwmMin)
+                robot.moveR(PWM_MIN)
     else:
-            cfu.steer(conf.basePwm, dev, dire, robot)
+            cfu.steer(BASE_PWM, dev, dire, robot)
     
-    cv.rectangle(image_draw, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2) 
-    cv.line(image_draw, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
-    cv.line(image_draw, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
+    cv.rectangle(image_draw, (CENTER_X - CENTER_TOLERANCE, CENTER_Y - CENTER_TOLERANCE), (CENTER_X + CENTER_TOLERANCE, CENTER_Y + CENTER_TOLERANCE), (0, 0, 255), 2) 
+    cv.line(image_draw, (0,int(SEEK_LINE * HEIGHT_OF_IMAGE-20)), (WIDTH_OF_IMAGE, int(SEEK_LINE * HEIGHT_OF_IMAGE-20)), (255,255,255), 3)
+    cv.line(image_draw, (0,int(SEEK_LINE * HEIGHT_OF_IMAGE+20)), (WIDTH_OF_IMAGE, int(SEEK_LINE * HEIGHT_OF_IMAGE+20)), (255,255,255), 3)
 
     try:
         cv.imshow("main", image_draw)
@@ -229,8 +202,8 @@ while True:
     if cv.waitKey(1) == ord('q'):
         break
 
-servoX = dr.Servo(conf.servoPinX)
-servoY = dr.Servo(conf.servoPinY)
+servoX.setAngle(SERVOX_POS)
+servoY.setAngle(SERVOY_POS)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()

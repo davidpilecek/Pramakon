@@ -1,7 +1,7 @@
 from time import sleep
 import sys
 sys.path.append('/home/pi/Documents/pigpiomaster')
-
+from config import *
 import pigpio
 
 import config as conf
@@ -43,7 +43,6 @@ class Servo():
            self.servoAngle = 180
         elif(self.servoAngle <= 0):
            self.servoAngle = 0
-
         self.dutyCycle = (self.servoAngle/180 + 1) * 1000
         self.pi.set_servo_pulsewidth(self.servoPin, self.dutyCycle)        
     def getAngle(self):
@@ -51,6 +50,23 @@ class Servo():
         self.currAngle = (self.currDutyCycle / 1000 - 1) * 180
         currAngle = self.currAngle
         return currAngle
+
+    def reset(self, servo, servo_pos):
+        global selection
+        global robot
+        self.servo_pos = servo_pos
+        self.curr = round(servo.getAngle())
+        robot.stop()
+        selection = FRAME_SELECT
+        if(self.curr > self.servo_pos):
+            for j in range(self.curr-self.servo_pos):
+                servo.setAngle(self.curr - j)
+                sleep(0.02)
+        else:
+            for i in range(abs(self.curr-self.servo_pos)):
+                servo.setAngle(self.curr + i)
+                sleep(0.02)
+
     def stopServo(self):
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
