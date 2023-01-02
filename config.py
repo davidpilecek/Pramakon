@@ -1,6 +1,8 @@
 import numpy as np
 import cv2 as cv
 
+DEBUG = 1
+
 servoX_pos = 110
 servoY_pos = 85
 
@@ -25,15 +27,12 @@ width = 200
 centerY = round(height / 2)
 centerX = round(width / 2)
 
-pathPC = r"C:\Users\David\Documents\git\OpenCVNew\video.mp4"
-pathPi = r"/home/pi/Desktop/video.mp4"
-
 path_pic = r"C:\Users\David\Desktop\cvPics\img"
 path_pic_Pi = r"/home/pi/Desktop/cvPics/img"
 
 blue = np.array([[95,70,80], [135,255,255]])
+green = np.array([[40, 80, 90], [95, 255, 255]])
 
-green = np.array([[45, 130, 90], [95, 255, 255]])
 tol = 10
 
 ang_tol = 10
@@ -48,17 +47,8 @@ servoPinY = 18
 
 basePwm = (pwmMin + pwmMax) / 2
 
-#values for brightness balancing
-increment = 8
-threshold = 120
-threshold_max = 250
-threshold_min = 50
-th_iterations = 15
-white_min=20
-white_max=50
-
 if __name__ == "__main__":
-    color = (95,60,200)
+    color = (40, 80, 90)
     print(color)
     while True:
         image = np.zeros((500, 500, 3), np.uint8)

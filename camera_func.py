@@ -66,30 +66,6 @@ def contours_line(image_draw, mask, height, width):
 
     return average_angle, image_draw
 
-def crop_img_line(img, height, width):
-
-    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-    height_1 = height/conf.crop_selection
-
-    vertices = [(0, height_1), (0, height),(width , height), (width, height_1)]
-    vertices = np.array([vertices], np.int32)
-
-    #create pure black frame size of image
-    mask = np.zeros_like(img)
-
-    match_mask_color = 255
-
-    area = round((height - height_1) * width)
-
-    #create pure white frame in area of interest
-    cv.fillPoly(mask, vertices, match_mask_color)
-
-    #return image with other area than AOI non-reactive to contour seeking algorithm
-    masked_image = cv.bitwise_and(img, mask)
-
-    return mask, area
-
 def crop_img_line_color(img, height, width, color, sel):
 
     crop_selection = 100/(100 - sel)
@@ -105,8 +81,6 @@ def crop_img_line_color(img, height, width, color, sel):
     match_mask_color = [255,255,255]
 
     area = round((height - height_1) * width)
-
-    img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
     #create pure white frame in area of interest
     cv.fillPoly(mask_black, vertices, match_mask_color)
@@ -124,47 +98,11 @@ def prep_pic(src):
 
     blurred = cv.GaussianBlur(frame, (7, 7), 0)
 
-    return blurred, height, width
+    blurred_hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
 
-def balance_pic(image, area, T):
-    ret = None
-    direction = 0
+    return blurred_hsv, height, width
 
-    for i in range(0, conf.th_iterations):
-        
-        rc, gray = cv.threshold(image, T, 255, cv.THRESH_BINARY)
-
-        if (np.all(gray == 0)):
-            pass
-
-        nwh = cv.countNonZero(gray)
-
-        perc = int(100 * nwh / area)
-
-        if perc > conf.white_max:
-            if T >= conf.threshold_max:
-                ret = gray
-                break
-            if direction == -1:
-                ret = gray
-                break
-            T += conf.increment
-            direction = 1
-        elif perc < conf.white_min:
-            if T < conf.threshold_min:
-                break
-            if  direction == 1:
-                ret = gray
-                break
-
-            T -= conf.increment
-            direction = -1
-        else:
-            ret = gray
-            break
-    return ret, T
-
-def deviance(ang):
+def deviation(ang):
     if ang == 90:
         return 0, 0
     elif ang > 90:

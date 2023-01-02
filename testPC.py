@@ -68,7 +68,7 @@ while True:
     if(obj_in_line == True and prev_obj_in_line == False):
         print("inl")
         print(contour_ID)
-        orig = cfu.check_orig(curr_cont, last_cont, contour_ID)
+        orig = cfu.check_orig(curr_cont, last_cont)
         print("in line")
         prev_obj_in_line = True
         centered = True
@@ -82,8 +82,8 @@ while True:
             print(path)
 
     cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2)
-    cv.line(image_draw, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
-    cv.line(image_draw, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
+    cv.line(blurred, (0,int(conf.seek_line * conf.height-20)), (conf.width, int(conf.seek_line * conf.height-20)), (255,255,255), 3)
+    cv.line(blurred, (0,int(conf.seek_line * conf.height+20)), (conf.width, int(conf.seek_line * conf.height+20)), (255,255,255), 3)
 
     try:
         cv.imshow("main", blurred)
