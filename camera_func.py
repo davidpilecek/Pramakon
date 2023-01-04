@@ -4,15 +4,11 @@ import config as conf
 from time import sleep
 from subprocess import run as srun
 
-
 def upload_pics_to_drive(dir_name = "cvPics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
 
     result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
 
     return result.returncode
-
-if __name__ == "__main__":
-    upload_pics_to_drive()
 
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
@@ -96,8 +92,8 @@ def crop_img_line_color(img, height, width, color, sel):
     #return image with other area than AOI non-reactive to contour seeking algorithm
     masked_image = cv.bitwise_and(img, mask_black)
     
-    mask = cv.inRange(masked_image, color[0], color[1])
-
+    # mask = cv.inRange(masked_image, color[0], color[1])
+    mask = cv.threshold(masked_image, 150, 255, cv.THRESH_BINARY_INV)
     return mask
 
 def prep_pic(src):
@@ -108,7 +104,9 @@ def prep_pic(src):
 
     blurred_hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
 
-    return blurred_hsv, height, width
+    blurred_bw = cv.cvtColor(blurred, cv.COLOR_BGR2GRAY)
+
+    return blurred_hsv,blurred_bw, height, width
 
 def deviation(ang):
     if ang == 90:
@@ -144,7 +142,7 @@ def save_pic(index, image, path_pic):
    
     cv.imwrite(path, image)
 
-    index +=1    
+    index += 1    
 
     return path, index
 
@@ -209,7 +207,6 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y):
         return True, currAngleX, currAngleY
     else:
         return False, currAngleX, currAngleY
-
 
 def crop_img_obj(img, w, h):
 

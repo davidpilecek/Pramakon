@@ -68,14 +68,13 @@ if not cap.isOpened():
 
 while True:
     _, frameOrig = cap.read()
-    #p, i, d = pid.components
     
     if(type(frameOrig) == type(None)):
         pass
     else:
         frame_resized = cv.resize(frameOrig, (HEIGHT_OF_IMAGE, WIDTH_OF_IMAGE))
-        img_hsv, height, width = cfu.prep_pic(frameOrig)
-        ret = cfu.crop_img_line_color(img_hsv, height, width, BLUE_HSV_RANGE, selection)
+        img_hsv, img_bw, height, width = cfu.prep_pic(frameOrig)
+        ret = cfu.crop_img_line_color(img_bw, height, width, BLUE_HSV_RANGE, selection)
         mask_obj = cv.inRange(img_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
   
     if(try_line == False):
@@ -101,7 +100,6 @@ while True:
          servoX.setAngle(SERVOX_POS)
          servoY.setAngle(SERVOY_POS)
 
-
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
 
@@ -119,7 +117,6 @@ while True:
                         color = (255, 255, 0)
                         obj_in_line = True
                         curr_cont = (cX, cY)                           
-                            
                     else:
                         prev_obj_in_line = False
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
