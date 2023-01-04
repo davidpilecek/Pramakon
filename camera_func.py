@@ -2,6 +2,17 @@ import cv2 as cv
 import numpy as np
 import config as conf
 from time import sleep
+from subprocess import run as srun
+
+
+def upload_pics_to_drive(dir_name = "cvPics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
+
+    result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
+
+    return result.returncode
+
+if __name__ == "__main__":
+    upload_pics_to_drive()
 
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]

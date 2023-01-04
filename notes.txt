@@ -1,0 +1,2 @@
+for making directory: ./gdrive upload <file> -p "DIRECTORY_ID"
+for uploading file: ./gdrive mkdir -p "PARENT_DIR_ID" <name_of_dir>

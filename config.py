@@ -28,7 +28,7 @@ CENTER_Y = round(HEIGHT_OF_IMAGE / 2)
 CENTER_X = round(WIDTH_OF_IMAGE / 2)
 
 PATH_PIC = r"C:\Users\David\Desktop\cvPics\img"
-PATH_PIC_PI = r"/home/pi/Desktop/cvPics/img"
+PATH_PIC_PI = r"/home/pi/Documents/Pramakon/unclassified_pics/img"
 
 BLUE_HSV_RANGE = np.array([[95,55,35], [135,255,255]])
 GREEN_HSV_RANGE = np.array([[50, 80, 50], [94, 255, 255]])
