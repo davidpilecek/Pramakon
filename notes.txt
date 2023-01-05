@@ -3,3 +3,4 @@ for uploading file: ./gdrive upload <file> -p "DIRECTORY_ID"
 
 TODO:
 set last_cont = () asa tracked contour disappears out of frame
+try if drive contains folder with pic and if so, delete the content before uploading
