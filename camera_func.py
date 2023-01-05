@@ -4,16 +4,17 @@ import config as conf
 from time import sleep
 from subprocess import run as srun
 
-def upload_pics_to_drive(dir_name = "cvPics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
+def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
 
     result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
+    srun(["rm", "/home/pi/Documents/Pramakon/unclassified_pics/*"])
 
     return result.returncode
 
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
     if(last_cont == ()): return True
-    elif(cX <= last_cont[0] + 20 and  cX >= last_cont[0] - 20 and  cY <= last_cont[1] + 20 and cY >= last_cont[1] - 20):
+    elif(cX <= last_cont[0] + 100 and  cX >= last_cont[0] - 100 and  cY <= last_cont[1] + 100 and cY >= last_cont[1] - 100):
         return False
     else: return True
 
@@ -83,17 +84,19 @@ def crop_img_line_color(img, height, width, color, sel):
 
     #create pure black frame size of image
     mask_black = np.zeros_like(img)
+    
+    match_mask_color = [255, 255, 255]
 
-    match_mask_color = [255,255,255]
-
-    #create pure white frame in area of interest
     cv.fillPoly(mask_black, vertices, match_mask_color)
 
-    #return image with other area than AOI non-reactive to contour seeking algorithm
+    #cv.fillPoly(mask_white, vertices, match_mask_color)   
+    mask_white = cv.bitwise_not(mask_black)
+
     masked_image = cv.bitwise_and(img, mask_black)
+    masked_image = cv.bitwise_or(masked_image, mask_white)
     
-    # mask = cv.inRange(masked_image, color[0], color[1])
-    mask = cv.threshold(masked_image, 150, 255, cv.THRESH_BINARY_INV)
+    #mask = cv.inRange(masked_image, color[0], color[1])
+    _, mask = cv.threshold(masked_image, 100, 255, cv.THRESH_BINARY_INV)
     return mask
 
 def prep_pic(src):

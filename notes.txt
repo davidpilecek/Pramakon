@@ -1,2 +1,5 @@
 for making directory: ./gdrive mkdir -p "PARENT_DIR_ID" <name_of_dir>
 for uploading file: ./gdrive upload <file> -p "DIRECTORY_ID"
+
+TODO:
+set last_cont = () asa tracked contour disappears out of frame

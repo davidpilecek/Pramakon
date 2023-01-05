@@ -1,6 +1,11 @@
 import numpy as np
 import cv2 as cv
 import time
+import camera_func as cfu
+from config import *
+
+height = 250
+width = 250
 
 cap = cv.VideoCapture(0)
 
@@ -16,46 +21,63 @@ fps_count = []
 
 while True:
 
-    _, frame = cap.read()
-
-    #frame = cv.resize(frame, (200, 200))
-
-    #frame_bw = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)    
-
-    if(type(frame) == type(None) or _ == False):
+    _, frame_orig = cap.read()
+    if(type(frame_orig) == type(None) or _ == False):
         pass
+
+    frame = cv.resize(frame_orig, (250, 250))
+
+    blurred = cv.GaussianBlur(frame, (7, 7), 0)
+
+    frame_hsv = cv.cvtColor(blurred, cv.COLOR_BGR2HSV)
+    
+    mask_obj = cv.inRange(frame_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
+
+    frame_bw = cv.cvtColor(blurred, cv.COLOR_BGR2GRAY) 
+
+    crop_selection = 100/(100 - 60)
+
+    height_1 = height/crop_selection
+
+    vertices = [(0, height_1), (0, height),(width, height), (width, height_1)]
+    vertices = np.array([vertices], np.int32)
+
+    #create pure black frame size of image
+    mask_black = np.zeros_like(frame_bw)
+    
+    match_mask_color = [255, 255, 255]
+
+    cv.fillPoly(mask_black, vertices, match_mask_color)
+
+    #cv.fillPoly(mask_white, vertices, match_mask_color)   
+    mask_white = cv.bitwise_not(mask_black)
+
+    masked_image = cv.bitwise_and(frame_bw, mask_black)
+    masked_image = cv.bitwise_or(masked_image, mask_white)
    
+    _, mask = cv.threshold(masked_image,100, 255, cv.THRESH_BINARY_INV)
+    
+    mask = cv.bitwise_xor(mask, mask_obj)
 
-    # font which we will be using to display FPS
-    font = cv.FONT_HERSHEY_SIMPLEX
-    # time when we finish processing for this frame
-    new_frame_time = time.time()
+    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
-    fps = 1/(new_frame_time-prev_frame_time)
-    prev_frame_time = new_frame_time
- 
-    # converting the fps into integer
-    fps = int(fps)
- 
-    fps_count.append(fps)
- 
-    # converting the fps to string so that we can display it on frame
-    # by using putText function
-    fps = str(fps)
- 
+    contour = max(contours, key = cv.contourArea, default=0)
+    
+    frame_bw = cv.cvtColor(frame_bw, cv.COLOR_GRAY2BGR)
+    cv.drawContours(frame_bw, [contour], -1, (0, 255, 0), 5)
+
     try:
-        cv.imshow("window", frame)
+        cv.imshow("window", mask_obj)
+        cv.imshow("mask", frame_bw)
+        cv.imshow("mask_line", mask)
       
     except Exception as e:
         print(str(e))
 
     if cv.waitKey(1) == ord('q'):
-
         break
-print("average:")
 
-print(int(sum(fps_count) / len(fps_count)))
 cap.release()
-
+print(mask_white)
 cv.destroyAllWindows()
 
