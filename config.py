@@ -8,7 +8,7 @@ SERVOY_POS = 30
 
 UPLOAD=False
 
-DO_DRIVE = True
+DO_DRIVE = False
 
 KP=0.7
 KI=0

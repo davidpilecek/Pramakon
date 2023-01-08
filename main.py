@@ -6,6 +6,9 @@ from config import *
 from drive import *
 from simple_pid import PID
 from logger import Logger
+from shutil import rmtree
+from os import mkdir
+
 
 logger = Logger()
 pid = PID(KP, KI, KD, setpoint = 90)
@@ -64,8 +67,13 @@ def search_seq(servoX, servoY, dire):
 servoX.setAngle(SERVOX_POS)
 servoY.setAngle(SERVOY_POS)
 
+
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
+
+if(UPLOAD):
+    rmtree(r'/home/pi/Documents/Pramakon/unclassified_pics') 
+    mkdir(r'/home/pi/Documents/Pramakon/unclassified_pics')
 
 while True:
     _, frameOrig = cap.read()

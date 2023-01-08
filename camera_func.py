@@ -7,7 +7,6 @@ from subprocess import run as srun
 def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
 
     result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
-    srun(["sudo", "rm", "-r", "/home/pi/Documents/Pramakon/unclassified_pics"])
 
     return result.returncode
 

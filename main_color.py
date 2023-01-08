@@ -1,5 +1,3 @@
-#try to stop servo after it's been aimed at object
-
 from time import sleep
 import cv2 as cv
 import numpy as np
@@ -7,14 +5,13 @@ import camera_func as cfu
 import config as conf
 import drive as dr
 from simple_pid import PID
-import matplotlib.pyplot as plt
+from logger import Logger
 
+
+logger = Logger()
 pid = PID(conf.p, conf.i, conf.d, setpoint = 90)
 pid.output_limits = (-45, 45)
 pid.sample_time = 0.01
-
-#angles_graph = []
-#devs_graph = []
 
 robot = dr.Robot(conf.leftMot, conf.rightMot)
 servoX = dr.Servo(conf.servoPinX)
@@ -35,15 +32,17 @@ line_found = True
 line_count = 0
 obj_in_line = False
 prev_obj_in_line = False
-obj_in_frame = False
 centered = False
+last_cont = ()
+curr_cont = ()
 orig = False
+save_last = True
 angleX = 0
 angleY = 0
 servo_cent = False
 servo_reset = False
 curr_time = 0
-
+image_draw = None
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -88,8 +87,6 @@ def res_servo(servoX, servoY):
             servoY.setAngle(currY + i)
             sleep(0.02)
 
-image_draw = None
-
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
@@ -97,6 +94,7 @@ servoX.setAngle(conf.servoX_pos)
 servoY.setAngle(conf.servoY_pos)
 
 while True:
+    
     currAngleX = round(servoX.getAngle())
     currAngleY = round(servoY.getAngle())
 
@@ -107,18 +105,18 @@ while True:
     if(type(frameOrig) == type(None)):
         pass
     else:
-        blurred, height, width = cfu.prep_pic(frameOrig)
-        ret, area = cfu.crop_img_line_color(blurred, height, width, conf.blue, selection)
-        mask_obj = cfu.obj_mask(blurred, conf.green)
+        img_hsv, height, width = cfu.prep_pic(frameOrig)
+        ret, area = cfu.crop_img_line_color(img_hsv, height, width, conf.blue, selection)
+        mask_obj = cfu.obj_mask(img_hsv, conf.green)
   
     if(try_line == False):
-        image_draw = blurred
+        image_draw = img_hsv
         robot.stop()
         pass
     
     else:
         try:
-            angle, image_draw = cfu.contours_line(blurred, ret, height, width)
+            angle, image_draw = cfu.contours_line(img_hsv, ret, height, width)
             line_found = True
             line_count += 1
         except Exception as e:
@@ -133,6 +131,7 @@ while True:
          sleep(0.5)
          servoX.setAngle(conf.servoX_pos)
          servoY.setAngle(conf.servoY_pos)
+
 
     try:
         contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
@@ -159,14 +158,36 @@ while True:
 
     except Exception as e:
         res_servo(servoX, servoY)
-        print("cannot find object")
+        logger.log.warning(f"object not found")
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
+        
+    if len(contours) == 0:
+        res_servo(servoX, servoY)
+        obj_in_line = False
+        orig = False
+        centered = False
+        try_line = True
 
-    if(obj_in_line and prev_obj_in_line == False and obj_in_frame):
+    if(obj_in_line == True and prev_obj_in_line == False):
         print("in line")
+        orig = cfu.check_orig(curr_cont, last_cont)
         prev_obj_in_line = True
-        robot.stop()
-        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
 
+    if(orig):
+        robot.stop()
+        
+        if(save_last):
+            print(" ")
+            print(f"last object: {last_cont}")
+            print(f"current object: " + str(curr_cont))
+            last_cont = (cX, cY)
+            save_last = False
+            logger.log.warning(f"saved current contour")
+        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
+        
     if (centered):
                 try_line = False
                 print("saving pic")
@@ -181,21 +202,12 @@ while True:
                 obj_in_line = False
                 centered = False
                 orig = False
+                save_last = True
                 try_line = True
 
-    _, dire = cfu.deviation(angle)
-
+    angle_pid, dire = cfu.deviance(angle)
+    
     dev = round(2*abs(pid(angle)))
-    
-    #print("dev: " + str(dev))
-    #print("angle: " + str(angle))
-    #print("p: " + str(p))
-    #print("i: " + str(i))
-    #print("d: " + str(d))
-    #print("      ")
-    
-    #angles_graph.append(angle)
-    #devs_graph.append(dev)
     
     if ((dev + conf.basePwm) > conf.pwmMax):
             if dire == 1:
@@ -222,7 +234,3 @@ servoY = dr.Servo(conf.servoPinY)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()
-#plt.plot(angles_graph, label = "angles")
-#plt.plot(devs_graph, label = "deviations")
-#plt.legend()
-#plt.show()

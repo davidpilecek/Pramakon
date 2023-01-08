@@ -8,7 +8,7 @@ kernel = np.ones((7, 7), np.uint8)
 index = 1
 
 path = r'C:\Users\david\Desktop\leaf0.jpg'
-path_save = r'C:\Users\david\Desktop\cvPics\img1'+ str(index) + r'.jpg'
+path_save = r'C:\Users\david\Desktop\cvPics\img'+ str(index) + r'.jpg'
 
 frame_orig = cv.imread(path)
 frame_orig = cv.resize(frame_orig, (500, 500))

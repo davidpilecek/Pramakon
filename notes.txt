@@ -1,6 +1,3 @@
-for making directory: ./gdrive mkdir -p "PARENT_DIR_ID" <name_of_dir>
-for uploading file: ./gdrive upload <file> -p "DIRECTORY_ID"
-
 TODO:
-set last_cont = () asa tracked contour disappears out of frame
+remove folder before start of program
 try if drive contains folder with pic and if so, delete the content before uploading
