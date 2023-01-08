@@ -42,6 +42,7 @@ servo_cent = False
 servo_reset = False
 curr_time = 0
 image_draw = None
+area = HEIGHT_OF_IMAGE * WIDTH_OF_IMAGE
 
 def search_seq(servoX, servoY, dire):
     robot.stop()
@@ -71,14 +72,11 @@ while True:
     
     if(type(frameOrig) == type(None)):
         pass
-    else:
-        frame_resized = cv.resize(frameOrig, (HEIGHT_OF_IMAGE, WIDTH_OF_IMAGE))
-	
-        img_hsv, img_bw, height, width = cfu.prep_pic(frameOrig)
-        area = height*width
-        ret = cfu.crop_img_line_color(img_bw, height, width, BLUE_HSV_RANGE, selection)
+    else:	
+        img_hsv, img_bw, frame_resized = cfu.prep_pic(frameOrig)
         mask_obj = cv.inRange(img_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
-        ret = cv.bitwise_xor(ret, mask_obj)
+        mask_line = cfu.crop_img_line_color(img_bw, selection, mask_obj)
+
     if(try_line == False):
         image_draw = frame_resized
         robot.stop()
@@ -86,7 +84,7 @@ while True:
     
     else:
         try:
-            angle, image_draw = cfu.contours_line(frame_resized, ret, height, width)
+            angle, image_draw = cfu.contours_line(frame_resized, mask_line)
             line_found = True
             line_count += 1
         except Exception as e:
@@ -105,7 +103,6 @@ while True:
 
     try:
             contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
-
             contour = max(contours, key = cv.contourArea)
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
@@ -120,7 +117,6 @@ while True:
                         color = (255, 255, 0)
                         obj_in_line = True
                         curr_cont = (cX, cY)
-                        
                                                     
                     elif(cY > SEEK_OBJECT * HEIGHT_OF_IMAGE + 35):
                         logger.log.info("contour out")
@@ -186,6 +182,7 @@ while True:
                 save_last = True
                 try_line = True
                 DO_DRIVE = True
+           
 
     _, dire = cfu.deviation(angle)
     
@@ -205,8 +202,8 @@ while True:
     cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE+25)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE+25)), (255,255,255), 3)
 
     try:
-        cv.imshow("main", image_draw)
-        cv.imshow("original", frameOrig)
+        cv.imshow("main", frame_resized)
+        cv.imshow("original", image_draw)
         cv.imshow("mask_obj", mask_obj)
     except Exception as e:
         robot.stop()

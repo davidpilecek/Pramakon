@@ -1,13 +1,13 @@
 import cv2 as cv
 import numpy as np
-import config as conf
+from config import *
 from time import sleep
 from subprocess import run as srun
 
 def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
 
     result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
-    srun(["rm", "/home/pi/Documents/Pramakon/unclassified_pics/*"])
+    srun(["sudo", "rm", "-r", "/home/pi/Documents/Pramakon/unclassified_pics"])
 
     return result.returncode
 
@@ -18,24 +18,23 @@ def check_orig(curr_cont, last_cont):
         return False
     else: return True
 
-def contours_line(image_draw, mask, height, width):
+def contours_line(frame_resized, mask):
+    image_draw = frame_resized
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
 
     contour = max(contours, key = cv.contourArea, default=0)
 
     cv.drawContours(image_draw, [contour], -1, (0, 255, 0), -1)
 
-    height, width = image_draw.shape[:2]
-
     [vx,vy,x,y] = cv.fitLine(contour, cv.DIST_L2,0,0.01,0.01)
     
     lefty = int((-x*vy/vx) + y)
-    righty = int(((height-x)*vy/vx)+y)
+    righty = int(((HEIGHT_OF_IMAGE-x)*vy/vx)+y)
 
     vy = float(vy)
     vx = float(vx)
 
-    cv.line(image_draw,(height-1,righty),(0,lefty),(0,255,255),5)
+    cv.line(image_draw,(HEIGHT_OF_IMAGE-1,righty),(0,lefty),(0,255,255),5)
 
     if 0<vy<1:
         ang_vector = np.degrees(np.arctan(vy/vx))
@@ -56,11 +55,11 @@ def contours_line(image_draw, mask, height, width):
 
     cv.circle(image_draw, (cX, cY), 10, (255, 255, 0), -1)
 
-    if cX > int(width / 2):
-             x_pos = 180 - np.degrees(np.arctan((height - cY) / (cX - int(width / 2))))
+    if cX > int(WIDTH_OF_IMAGE / 2):
+             x_pos = 180 - np.degrees(np.arctan((HEIGHT_OF_IMAGE - cY) / (cX - int(WIDTH_OF_IMAGE / 2))))
 
-    elif cX < int(width / 2):
-             x_pos = np.degrees(np.arctan((height - cY) / (int(width / 2) - cX )))
+    elif cX < int(WIDTH_OF_IMAGE / 2):
+             x_pos = np.degrees(np.arctan((HEIGHT_OF_IMAGE - cY) / (int(WIDTH_OF_IMAGE / 2) - cX )))
     else:
          cX, cY = [0, 0]
          x_pos = 90
@@ -73,35 +72,31 @@ def contours_line(image_draw, mask, height, width):
 
     return average_angle, image_draw
 
-def crop_img_line_color(img, height, width, color, sel):
+def crop_img_line_color(img, sel, mask_obj):
 
-    crop_selection = 100/(100 - sel)
+    mask = cv.adaptiveThreshold(img, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 91, 20)
 
-    height_1 = height/crop_selection
+    #mask_del = cv.bitwise_xor(mask, mask_obj)
 
-    vertices = [(0, height_1), (0, height),(width, height), (width, height_1)]
+    crop_selection = 100/(100 - 60)
+
+    height_1 = HEIGHT_OF_IMAGE/crop_selection
+
+    vertices = [(0, height_1), (0, HEIGHT_OF_IMAGE),(WIDTH_OF_IMAGE, HEIGHT_OF_IMAGE), (WIDTH_OF_IMAGE, height_1)]
     vertices = np.array([vertices], np.int32)
 
     #create pure black frame size of image
-    mask_black = np.zeros_like(img)
+    mask_black = np.zeros_like(mask)
     
     match_mask_color = [255, 255, 255]
 
     cv.fillPoly(mask_black, vertices, match_mask_color)
 
-    #cv.fillPoly(mask_white, vertices, match_mask_color)   
-    mask_white = cv.bitwise_not(mask_black)
-
-    masked_image = cv.bitwise_and(img, mask_black)
-    masked_image = cv.bitwise_or(masked_image, mask_white)
-    
-    #mask = cv.inRange(masked_image, color[0], color[1])
-    _, mask = cv.threshold(masked_image, 100, 255, cv.THRESH_BINARY_INV)
-    return mask
+    masked_image = cv.bitwise_and(mask, mask_black)
+    return masked_image
 
 def prep_pic(src):
-    frame = cv.resize(src, (conf.HEIGHT_OF_IMAGE, conf.WIDTH_OF_IMAGE))
-    height, width = frame.shape[:2]
+    frame = cv.resize(src, (HEIGHT_OF_IMAGE, WIDTH_OF_IMAGE))
 
     blurred = cv.GaussianBlur(frame, (7, 7), 0)
 
@@ -109,7 +104,7 @@ def prep_pic(src):
 
     blurred_bw = cv.cvtColor(blurred, cv.COLOR_BGR2GRAY)
 
-    return blurred_hsv,blurred_bw, height, width
+    return blurred_hsv,blurred_bw, frame
 
 def deviation(ang):
     if ang == 90:
@@ -156,7 +151,7 @@ def contours_obj(img_draw, mask):
 
     for contour in contours:
         x,y,w,h = cv.boundingRect(contour)
-        if(w > conf.WIDTH_OF_IMAGE/20) and (h > conf.HEIGHT_OF_IMAGE/20):
+        if(w > WIDTH_OF_IMAGE/20) and (h > HEIGHT_OF_IMAGE/20):
             cv.rectangle(img_draw, (x,y), (x+w,y+h), (0,0,255), 5)
 
     if len(contours)>0:
@@ -167,11 +162,11 @@ def contours_obj(img_draw, mask):
     else:
         pass
     cv.circle(img_draw, (cX, cY), 5, (255, 0, 255), -1)
-    if cX > int(conf.WIDTH_OF_IMAGE / 2):
-             obj_angle = 180 - np.degrees(np.arctan((conf.HEIGHT_OF_IMAGE - cY) / (cX - int(conf.WIDTH_OF_IMAGE / 2))))
+    if cX > int(WIDTH_OF_IMAGE / 2):
+             obj_angle = 180 - np.degrees(np.arctan((HEIGHT_OF_IMAGE - cY) / (cX - int(WIDTH_OF_IMAGE / 2))))
 
-    elif cX < int(conf.WIDTH_OF_IMAGE / 2):
-             obj_angle = np.degrees(np.arctan((conf.HEIGHT_OF_IMAGE - cY) / (int(conf.WIDTH_OF_IMAGE / 2) - cX )))
+    elif cX < int(WIDTH_OF_IMAGE / 2):
+             obj_angle = np.degrees(np.arctan((HEIGHT_OF_IMAGE - cY) / (int(WIDTH_OF_IMAGE / 2) - cX )))
     else:
          cX, cY = [0, 0]
          obj_angle = 90
@@ -186,20 +181,20 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y):
     sleep(0.1)
     cent_x = False
     cent_y = False
-    if(obj_x > conf.CENTER_X + conf.CENTER_TOLERANCE):
-          servoX.setAngle(currAngleX - conf.SERVO_STEP)
+    if(obj_x > CENTER_X + CENTER_TOLERANCE):
+          servoX.setAngle(currAngleX - SERVO_STEP)
           cent_x = False
-    elif(obj_x < conf.CENTER_X - conf.CENTER_TOLERANCE):
-          servoX.setAngle(currAngleX + conf.SERVO_STEP)
+    elif(obj_x < CENTER_X - CENTER_TOLERANCE):
+          servoX.setAngle(currAngleX + SERVO_STEP)
           cent_x = False
     else:
         cent_x = True
         
-    if(obj_y > conf.CENTER_Y + conf.CENTER_TOLERANCE):
-          servoY.setAngle(currAngleY - conf.SERVO_STEP)
+    if(obj_y > CENTER_Y + CENTER_TOLERANCE):
+          servoY.setAngle(currAngleY - SERVO_STEP)
           cent_y = False
-    elif(obj_y < conf.CENTER_Y - conf.CENTER_TOLERANCE):
-          servoY.setAngle(currAngleY + conf.SERVO_STEP)
+    elif(obj_y < CENTER_Y - CENTER_TOLERANCE):
+          servoY.setAngle(currAngleY + SERVO_STEP)
           cent_y = False
     else:
         cent_y = True

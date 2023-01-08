@@ -12,13 +12,6 @@ cap = cv.VideoCapture(0)
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
-# used to record the time when we processed last frame
-prev_frame_time = 0
- 
-# used to record the time at which we processed current frame
-new_frame_time = 0
-fps_count = []
-
 while True:
 
     _, frame_orig = cap.read()
@@ -35,6 +28,11 @@ while True:
 
     frame_bw = cv.cvtColor(blurred, cv.COLOR_BGR2GRAY) 
 
+    mask = cv.adaptiveThreshold(frame_bw, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 71, 20)
+   
+    mask_del = mask
+    #mask_del = cv.bitwise_xor(mask, mask_obj)
+
     crop_selection = 100/(100 - 60)
 
     height_1 = height/crop_selection
@@ -43,33 +41,24 @@ while True:
     vertices = np.array([vertices], np.int32)
 
     #create pure black frame size of image
-    mask_black = np.zeros_like(frame_bw)
+    mask_black = np.zeros_like(mask_del)
     
     match_mask_color = [255, 255, 255]
 
     cv.fillPoly(mask_black, vertices, match_mask_color)
 
-    #cv.fillPoly(mask_white, vertices, match_mask_color)   
-    mask_white = cv.bitwise_not(mask_black)
-
-    masked_image = cv.bitwise_and(frame_bw, mask_black)
-    masked_image = cv.bitwise_or(masked_image, mask_white)
-   
-    _, mask = cv.threshold(masked_image,100, 255, cv.THRESH_BINARY_INV)
-    
-    mask = cv.bitwise_xor(mask, mask_obj)
-
-    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
-
-    contour = max(contours, key = cv.contourArea, default=0)
-    
+    masked_image = cv.bitwise_and(mask_del, mask_black)     
     frame_bw = cv.cvtColor(frame_bw, cv.COLOR_GRAY2BGR)
-    cv.drawContours(frame_bw, [contour], -1, (0, 255, 0), 5)
+
+    #contours, hierarchy = cv.findContours(masked_image, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
+    #if(len(contours) > 0):
+    #	contour = max(contours, key = cv.contourArea)
+    #	cv.drawContours(frame_bw, [contour], -1, (0, 255, 0), -1)
 
     try:
-        cv.imshow("window", mask_obj)
-        cv.imshow("mask", frame_bw)
-        cv.imshow("mask_line", mask)
+        cv.imshow("masked_image", frame_bw)
+        cv.imshow("mask_obj", mask_obj)
+        cv.imshow("frame", frame_orig)
       
     except Exception as e:
         print(str(e))
@@ -78,6 +67,5 @@ while True:
         break
 
 cap.release()
-print(mask_white)
 cv.destroyAllWindows()
 
