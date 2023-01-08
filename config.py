@@ -4,11 +4,11 @@ import cv2 as cv
 DEBUG = 1
 
 SERVOX_POS = 80 
-SERVOY_POS = 30
+SERVOY_POS = 35
 
-UPLOAD=False
+UPLOAD=True
 
-DO_DRIVE = False
+DO_DRIVE = True
 
 KP=0.7
 KI=0
@@ -17,11 +17,10 @@ KD=0.12
 FRAME_SELECT= 60
 
 #point of frame at which we seek the presence of object
-SEEK_OBJECT = 0.65
-
+SEEK_OBJECT = 0.6
 #PWM values
-PWM_MIN = 52
-PWM_MAX = 70
+PWM_MIN = 40
+PWM_MAX = 60
 PWM_FREQUENCY = 25
 
 #height and width of image
@@ -35,9 +34,9 @@ PATH_PIC = r"C:\Users\David\Desktop\cvPics\img"
 PATH_PIC_PI = r"/home/pi/Documents/Pramakon/unclassified_pics/img"
 
 BLUE_HSV_RANGE = np.array([[95,55,35], [135,255,255]])
-GREEN_HSV_RANGE = np.array([[40, 70, 50], [80, 255, 255]])
+GREEN_HSV_RANGE = np.array([[40, 50, 50], [80, 255, 255]])
 
-CENTER_TOLERANCE = 10
+CENTER_TOLERANCE = 30
 
 ANGLE_TOLERANCE = 10
 

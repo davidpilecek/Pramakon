@@ -28,7 +28,7 @@ while True:
 
     frame_bw = cv.cvtColor(blurred, cv.COLOR_BGR2GRAY) 
 
-    mask = cv.adaptiveThreshold(frame_bw, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 71, 20)
+    mask = cv.adaptiveThreshold(frame_bw, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 91, 20)
    
     mask_del = mask
     #mask_del = cv.bitwise_xor(mask, mask_obj)
@@ -50,10 +50,10 @@ while True:
     masked_image = cv.bitwise_and(mask_del, mask_black)     
     frame_bw = cv.cvtColor(frame_bw, cv.COLOR_GRAY2BGR)
 
-    #contours, hierarchy = cv.findContours(masked_image, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
-    #if(len(contours) > 0):
-    #	contour = max(contours, key = cv.contourArea)
-    #	cv.drawContours(frame_bw, [contour], -1, (0, 255, 0), -1)
+    contours, hierarchy = cv.findContours(masked_image, cv.RETR_TREE ,cv.CHAIN_APPROX_NONE)
+    if(len(contours) > 0):
+    	contour = max(contours, key = cv.contourArea)
+    	cv.drawContours(frame_bw, [contour], -1, (0, 255, 0), -1)
 
     try:
         cv.imshow("masked_image", frame_bw)

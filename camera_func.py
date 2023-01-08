@@ -3,17 +3,27 @@ import numpy as np
 from config import *
 from time import sleep
 from subprocess import run as srun
+import os
 
-def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1xhbGwuUqqbZ6ftwg7GMuW4ioxhQ13qsr"):
+def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1PxzpWymlOXXaXND_W88hRYUJkKNvxSS2"):
+    command = "./gdrive list -q \"'1PxzpWymlOXXaXND_W88hRYUJkKNvxSS2' in parents\" --no-header --max 0| cut -d\" \" -f1 - | xargs -L 1 ./gdrive delete -r"
+    srun(command,shell=True)
 
-    result = srun(["./gdrive", "upload", "--recursive", dir_name, "-p", dir_id])
+    _, _, files = next(os.walk(dir_name))
+    num_of_pics = len(files)
+
+    for index in range(0, num_of_pics):
+        result = srun(["./gdrive", "upload", f"{dir_name}img{index}.jpg", "-p", dir_id])
 
     return result.returncode
+
+if __name__ == "__main__":
+    upload_pics_to_drive()
 
 def check_orig(curr_cont, last_cont):
     cX, cY = curr_cont[:2]
     if(last_cont == ()): return True
-    elif(cX <= last_cont[0] + 100 and  cX >= last_cont[0] - 100 and  cY <= last_cont[1] + 100 and cY >= last_cont[1] - 100):
+    elif(cX <= last_cont[0] + 50 and  cX >= last_cont[0] - 50 and  cY <= last_cont[1] + 50 and cY >= last_cont[1] - 50):
         return False
     else: return True
 
@@ -177,6 +187,7 @@ def contours_obj(img_draw, mask):
 def aim_camera_obj(servoX, servoY, obj_x, obj_y):
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
+    print("aiming")
     sleep(0.1)
     cent_x = False
     cent_y = False
@@ -202,8 +213,10 @@ def aim_camera_obj(servoX, servoY, obj_x, obj_y):
         servoX.stopServo()
         servoY.stopServo()
         return True, currAngleX, currAngleY
+        print("aimed")
     else:
         return False, currAngleX, currAngleY
+        print("not aimed")
 
 def crop_img_obj(img, w, h):
 

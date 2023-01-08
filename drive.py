@@ -4,8 +4,6 @@ sys.path.append('/home/pi/Documents/pigpiomaster')
 from config import *
 import pigpio
 
-import config as conf
-
 class Robot():
     def __init__(self, leftMot, rightMot):
         self.pi = pigpio.pi()
@@ -20,16 +18,25 @@ class Robot():
     def straight(self, speed):
         self.pi.set_PWM_dutycycle(self.leftMot, speed)
         self.pi.set_PWM_dutycycle(self.rightMot, speed)
+        print(f"left: {self.pi.get_PWM_dutycycle(self.leftMot)}")
+        print(f"right: {self.pi.get_PWM_dutycycle(self.rightMot)}")
     def moveBoth(self, speedL, speedR):
         self.pi.set_PWM_dutycycle(self.leftMot, speedL)
         self.pi.set_PWM_dutycycle(self.rightMot, speedR)
+        print(f"left: {self.pi.get_PWM_dutycycle(self.leftMot)}")
+        print(f"right: {self.pi.get_PWM_dutycycle(self.rightMot)}")
     def moveL(self, speed):
         self.pi.set_PWM_dutycycle(self.leftMot, speed)
         self.pi.set_PWM_dutycycle(self.rightMot, 0)
+        print(f"left: {self.pi.get_PWM_dutycycle(self.leftMot)}")
+        print(f"right: {self.pi.get_PWM_dutycycle(self.rightMot)}")
     def moveR(self, speed):
         self.pi.set_PWM_dutycycle(self.leftMot, 0)
         self.pi.set_PWM_dutycycle(self.rightMot, speed)
+        print(f"left: {self.pi.get_PWM_dutycycle(self.leftMot)}")
+        print(f"right: {self.pi.get_PWM_dutycycle(self.rightMot)}")
     def stop(self):
+        print(f"stopping robot")
         self.pi.set_PWM_dutycycle(self.leftMot, 0)
         self.pi.set_PWM_dutycycle(self.rightMot, 0)
         
@@ -68,7 +75,9 @@ class Servo():
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
 if __name__ == "__main__":
-         robot = Robot(conf.leftMot, conf.rightMot)
+         robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
+         robot.straight(40)
+         sleep(1)
          robot.stop()
          
         
