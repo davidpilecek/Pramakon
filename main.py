@@ -5,21 +5,19 @@ import camera_func as cfu
 from config import *
 from drive import *
 from simple_pid import PID
-from logger import Logger
 from shutil import rmtree
 from os import mkdir
-
-logger = Logger()
+#create instance of PID controller
 pid = PID(KP, KI, KD, setpoint = 90)
 pid.output_limits = (-45, 45)
 pid.sample_time = 0.01
-
+#create objects of robot (motors) and servos
 robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
 servoX = Servo(X_SERVO_PIN)
 servoY = Servo(Y_SERVO_PIN)
-
+#capture webcam feed
 cap = cv.VideoCapture(0)
-
+#variables
 dire = 0
 angle = 0
 ret = None
@@ -36,20 +34,20 @@ angleX = 0
 angleY = 0
 image_draw = None
 area = HEIGHT_OF_IMAGE * WIDTH_OF_IMAGE
-
+#run in case driving track is lost
 def search_seq(servoX, servoY, dire):
     robot.stop()
     global try_line
     global line_count
     line_count = 0
-    logger.log.info(f"searching for track")
+   
     servoY.setAngle(SERVOY_POS + 20)
     selection = FRAME_SELECT + 30
     if (dire == -1):
-        logger.log.info(f"looking right")
+     
         servoX.setAngle(SERVOX_POS - 40)
     elif(dire == 1):
-        logger.log.info(f"looking left")
+   
         servoX.setAngle(SERVOX_POS + 40)
     sleep(0.5)
     try_line = True
@@ -64,16 +62,15 @@ if(UPLOAD):
     rmtree(r'/home/pi/Documents/Pramakon/unclassified_pics') 
     mkdir(r'/home/pi/Documents/Pramakon/unclassified_pics')
 
+#main loop where all of the magic happens
 while True:
     _, frameOrig = cap.read()
-    print(obj_in_line)
     if(type(frameOrig) == type(None)):
         pass
     else:	
         img_hsv, img_bw, frame_resized = cfu.prep_pic(frameOrig)
         mask_obj = cv.inRange(img_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
-        #mask_obj = np.zeros_like(img_hsv)
-        mask_line = cfu.crop_img_line_color(img_bw, selection, mask_obj)
+        mask_line = cfu.crop_img_line_color(img_bw, selection)
 
     if(try_line == False):
         image_draw = frame_resized
@@ -85,8 +82,8 @@ while True:
             angle, image_draw = cfu.contours_line(frame_resized, mask_line)
             line_found = True
             line_count += 1
+
         except Exception as e:
-            logger.log.warning("line not found")
             line_found = False
             servoX.setAngle(SERVOX_POS)
             servoY.setAngle(SERVOY_POS)
@@ -104,13 +101,15 @@ while True:
             contour = max(contours, key = cv.contourArea)
             x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
+
             if(w > WIDTH_OF_IMAGE/8) and (h > HEIGHT_OF_IMAGE/8) and (cv.contourArea(contour) > area/150) :
+
                 if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
                     string = str(cX) + " " + str(cY)
                     color = (255, 0, 255)
-                    #obj_in_line = False
+
                     if(cY>= SEEK_OBJECT * HEIGHT_OF_IMAGE-30 and cY<= SEEK_OBJECT * HEIGHT_OF_IMAGE+30):
                         color = (255, 255, 0)
                         obj_in_line = True
@@ -118,6 +117,7 @@ while True:
                                                     
                     else:
                         prev_obj_in_line = False
+
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
                     cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255))
 
@@ -127,23 +127,12 @@ while True:
 
     if(obj_in_line == True and prev_obj_in_line == False):
         try_line = False
-        logger.log.info(f"object is in line")
         prev_obj_in_line = True
         robot.stop()
         DO_DRIVE = False
         
     if(obj_in_line):
         centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
-
-   # if len(contours) == 0:
-        #logger.log.info(f"0contours")
-        #servoX.reset(servoX, SERVOX_POS)
-        #servoY.reset(servoY, SERVOY_POS)
-        #obj_in_line = False
-        #orig = False
-        #centered = False
-        #try_line = True
-        #DO_DRIVE = True         
 
     if(centered):
                 print("saving pic")
@@ -168,13 +157,11 @@ while True:
                 servoY.reset(servoY, SERVOY_POS)
                 robot.stop()
 
-
-                
-
     _, dire = cfu.deviation(angle)
     
+    #degree evaluation by PID controller
     dev = round(2*abs(pid(angle)))
-    
+    #driving decisions
     if(DO_DRIVE):
          if ((dev + BASE_PWM) > PWM_MAX):
                  if dire == 1:
@@ -183,11 +170,11 @@ while True:
                      robot.moveR(PWM_MIN)
          else:
                  cfu.steer(BASE_PWM, dev, dire, robot)
-    
+    #drawing guidance stuff
     cv.rectangle(image_draw, (CENTER_X - CENTER_TOLERANCE, CENTER_Y - CENTER_TOLERANCE), (CENTER_X + CENTER_TOLERANCE, CENTER_Y + CENTER_TOLERANCE), (0, 0, 255), 2) 
     cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (255,255,255), 3)
     cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (255,255,255), 3)
-
+    #show feed
     try:
         cv.imshow("orig", frameOrig)
         cv.imshow("draw", image_draw)
@@ -196,12 +183,14 @@ while True:
         
     if cv.waitKey(1) == ord('q'):
         break
-
+#reset everything once program ends
 servoX.setAngle(SERVOX_POS)
 servoY.setAngle(SERVOY_POS)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()
+
+#in case you want to upload this run of imgs to drive
 if(UPLOAD):
 	upload_result = cfu.upload_pics_to_drive()
 	print(upload_result)
