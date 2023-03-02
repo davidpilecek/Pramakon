@@ -1,35 +1,62 @@
-import cv2 as cv
-import numpy as np
-import config as conf
-import matplotlib.pyplot as plt
+test_path = r"C:\Users\David\Desktop\Pramakon\test"
+train_path = r"C:\Users\David\Desktop\Pramakon\train"
+import torch
+import torchvision.models as models
+import torch.optim as optim
+import torchvision.datasets as datasets
+import torchvision.transforms as transforms
 
-kernel = np.ones((7, 7), np.uint8)
+# Load the pre-trained ResNet50 model
+model = models.resnet50(pretrained=True)
 
-index = 1
+# Modify the final layer to output only two classes
+num_ftrs = model.fc.in_features
+model.fc = torch.nn.Linear(num_ftrs, 2)
 
-path = r'C:\Users\david\Desktop\leaf0.jpg'
-path_save = r'C:\Users\david\Desktop\cvPics\img'+ str(index) + r'.jpg'
+# Define the loss function (e.g., cross-entropy)
+criterion = torch.nn.CrossEntropyLoss()
 
-frame_orig = cv.imread(path)
-frame_orig = cv.resize(frame_orig, (500, 500))
-black_img = np.zeros_like(frame_orig)
-white_img = cv.bitwise_not(black_img)
+# Define the optimizer (e.g., stochastic gradient descent)
+optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-frame_hsv = cv.cvtColor(frame_orig, cv.COLOR_BGR2HSV)
-mask_hsv = cv.inRange(frame_hsv, conf.green[0], conf.green[1])
-print(mask_hsv)
-contours, _ = cv.findContours(mask_hsv, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-contour = max(contours, key=cv.contourArea)
+# Define the transforms for the dataset
+transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
 
-img_cont = cv.drawContours(white_img, [contour], -1, (0, 0, 0), -1)
+# Load the dataset
+train_dataset = datasets.ImageFolder(train_path, transform=transform)
 
-green_part = cv.bitwise_or(frame_orig, img_cont)
+# Create a data loader for the training data
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
 
-x, y, w, h = cv.boundingRect(contour)
+# Train the model for several epochs
+num_epochs = 10
+for epoch in range(num_epochs):
+    running_loss = 0.0
+    for i, data in enumerate(train_loader, 0):
+        inputs, labels = data
+        optimizer.zero_grad()
 
-img_draw_cropped = green_part[y:y+h, x:x+w]
+        # Forward pass
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
 
-img_draw_cropped = cv.resize(img_draw_cropped, (192,192))
+        # Backward pass and optimization
+        loss.backward()
+        optimizer.step()
 
-cv.imshow("final image", img_draw_cropped)
-cv.waitKey(0)
+        # Accumulate the loss
+        running_loss += loss.item()
+
+    # Print statistics after every epoch
+    print('Epoch %d loss: %.3f' % (epoch+1, running_loss/len(train_loader)))
+    running_loss = 0.0
+
+
+# Save the model to a file
+torch.save(model.state_dict(), 'fine_tuned_resnet50.pth')
