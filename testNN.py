@@ -1,5 +1,5 @@
 test_path = r"C:\Users\David\Desktop\Pramakon\test"
-train_path = r"C:\Users\David\Desktop\Pramakon\train"
+train_path = r"C:\Users\david\Desktop\leaf_classifier\dataset"
 import torch
 import torchvision.models as models
 import torch.optim as optim
@@ -35,7 +35,7 @@ train_dataset = datasets.ImageFolder(train_path, transform=transform)
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
 
 # Train the model for several epochs
-num_epochs = 10
+num_epochs = 4
 for epoch in range(num_epochs):
     running_loss = 0.0
     for i, data in enumerate(train_loader, 0):
