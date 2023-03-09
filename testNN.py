@@ -1,4 +1,4 @@
-test_path = r"C:\Users\David\Desktop\Pramakon\test"
+test_path = r"~/Pramakon/pics"
 train_path = r"C:\Users\david\Desktop\leaf_classifier\dataset"
 import torch
 import torchvision.models as models
@@ -7,6 +7,9 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch import nn
 from PIL import Image
+import pathlib
+temp = pathlib.PosixPath
+pathlib.WindowsPath = pathlib.PosixPath
 # Load the pre-trained ResNet50 model
 model = models.resnet50(pretrained=True)
 
@@ -62,7 +65,7 @@ num_epochs = 4
 resnet50 = models.resnet50(pretrained=True)
 num_classes = 2 # Change this to match the number of classes in your dataset
 resnet50.fc = nn.Linear(resnet50.fc.in_features, num_classes)
-resnet50.load_state_dict(torch.load("fine_tuned_resnet50.pth"))
+resnet50.load_state_dict(torch.load("fastai_model.pkl"))
 resnet50.eval()
 
 # Save the model to a file
