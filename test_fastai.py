@@ -10,8 +10,8 @@ warnings.filterwarnings("ignore", category=UserWarning)
 #DEFINICE PROMENNYCH A CEST K ULOZISTIM
 species = 'sage', 'nettle'
 
-device = 'rpi'
-#device = 'pc'
+#device = 'rpi'
+device = 'pc'
 
 if device == "rpi":
      path_csv = 'results.csv'
