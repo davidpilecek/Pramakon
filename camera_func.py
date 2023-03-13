@@ -5,8 +5,7 @@ from time import sleep
 from subprocess import run as srun
 import os
 
-def upload_pics_to_drive(dir_name = "/home/pi/Documents/Pramakon/unclassified_pics/", dir_id = "1PxzpWymlOXXaXND_W88hRYUJkKNvxSS2"):
-    command = "./gdrive list -q \"'1PxzpWymlOXXaXND_W88hRYUJkKNvxSS2' in parents\" --no-header --max 0| cut -d\" \" -f1 - | xargs -L 1 ./gdrive delete -r"
+
     srun(command,shell=True)
     _, _, files = next(os.walk(dir_name))
     num_of_pics = len(files)
