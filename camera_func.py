@@ -6,8 +6,7 @@ from subprocess import run as srun
 import os
 
 
-    srun(command,shell=True)
-    _, _, files = next(os.walk(dir_name))
+ files = next(os.walk(dir_name))
     num_of_pics = len(files)
 
     for index in range(0, num_of_pics):
