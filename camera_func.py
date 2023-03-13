@@ -2,17 +2,6 @@ import cv2 as cv
 import numpy as np
 from config import *
 from time import sleep
-from subprocess import run as srun
-import os
-
-
- files = next(os.walk(dir_name))
-    num_of_pics = len(files)
-
-    for index in range(0, num_of_pics):
-        result = srun(["./gdrive", "upload", f"{dir_name}img{index}.jpg", "-p", dir_id])
-
-    return result.returncode
 
 def contours_line(frame_resized, mask):
     image_draw = frame_resized
