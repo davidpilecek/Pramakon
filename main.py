@@ -1,6 +1,5 @@
 from time import sleep
 import cv2 as cv
-import numpy as np
 import camera_func as cfu
 from config import *
 from drive import *
@@ -59,8 +58,8 @@ if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 if(UPLOAD):
-    rmtree(r'/home/pi/Documents/Pramakon/unclassified_pics') 
-    mkdir(r'/home/pi/Documents/Pramakon/unclassified_pics')
+    rmtree(r'~/Pramakon/unclassified_pics') 
+    mkdir(r'~/Pramakon/unclassified_pics')
 
 #main loop where all of the magic happens
 while True:
@@ -123,7 +122,7 @@ while True:
 
     except Exception as e:
              contours = []
-             print(f"no object cont")
+             print(f"no object contour")
 
     if(obj_in_line == True and prev_obj_in_line == False):
         try_line = False
@@ -144,18 +143,13 @@ while True:
                 print(path)
                 sleep(0.5)    
                 servoX.reset(servoX, SERVOX_POS) 
-                servoY.setAngle(SERVOY_POS + 20)
+                servoY.reset(servoY, SERVOY_POS)
                 robot.straight(40)
                 sleep(0.2)
                 DO_DRIVE = True                    
                 obj_in_line = False
                 centered = False
-                orig = False
-                save_last = True
                 try_line = True
-                servoX.reset(servoX, SERVOX_POS) 
-                servoY.reset(servoY, SERVOY_POS)
-                robot.stop()
 
     _, dire = cfu.deviation(angle)
     
@@ -189,8 +183,3 @@ servoY.setAngle(SERVOY_POS)
 robot.stop()
 cap.release()
 cv.destroyAllWindows()
-
-#in case you want to upload this run of imgs to drive
-if(UPLOAD):
-	upload_result = cfu.upload_pics_to_drive()
-	print(upload_result)
