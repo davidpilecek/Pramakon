@@ -7,7 +7,7 @@ from config import *
 height = 250
 width = 250
 
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(0)
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")

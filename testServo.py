@@ -12,3 +12,5 @@ sleep(1)
 
 servoX.reset(servoX, SERVOX_POS)
 servoY.reset(servoY, SERVOY_POS)
+servoX.stopServo()
+servoY.stopServo()
