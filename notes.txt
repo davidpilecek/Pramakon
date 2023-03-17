@@ -1,9 +1,16 @@
+upper Y = 0.6*250 - 30 = 120
+lower Y = 0.6*250 + 30 = 180
+
+center: +-30 = 95, 155
+//////////////////////////////////////////////////////////
 TODO:
 install simple_pid on RPi
 
 check if path for saving pics in main row 60 is correct
 
 improve photo taking part of code to decrease blur
+reason why blur despite sleep: after it sleeps, it's still at the same frame
+
 
 in main, get rid of sleep functions and make it so that
 robot is able to stop, aim at object, and aim back at track, then resume drive without
@@ -22,6 +29,5 @@ if X = 1 and Y = 1, robot does:  stops
                                  robot resets to default servo position
 robot drives on
 object disappears from frame completely, X=0, Y = 1
-
 
 comment code

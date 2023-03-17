@@ -1,150 +1,125 @@
 from time import sleep
-import cv2 as cv
-import numpy as np
-import camera_func as cfu
-import config as conf
-import drive as dr
 from time import time
+import cv2 as cv
+import camera_func as cfu
+from config import *
+from shutil import rmtree
+from os import mkdir
+import threading
+from drive import *
 
-robot = dr.Robot(conf.leftMot, conf.rightMot)
-servoX = dr.Servo(conf.servoPinX)
-servoY = dr.Servo(conf.servoPinY)
+robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
+servoX = Servo(X_SERVO_PIN)
+servoY = Servo(Y_SERVO_PIN)
 
 servoX.stopServo()
 servoY.stopServo()
 cap = cv.VideoCapture(0)
-
+#variables
 dire = 0
-frame_draw = []
 angle = 0
 ret = None
 cX, cY = [0, 0]
 index = 0
-res = True
-last_time = 0
 try_line = True
-selection = conf.frame_select
+selection = FRAME_SELECT
 line_found = True
 line_count = 0
 obj_in_line = False
 prev_obj_in_line = False
 centered = False
-last_cont = ()
-curr_cont = ()
-orig = False
-save_last = True
 angleX = 0
 angleY = 0
-currAngleX = servoX.getAngle()
-currAngleY = servoY.getAngle()
-contour_ID = 0
-
-
-def res_servo(servoX, servoY):
-    global selection
-    global robot
-    robot.stop()
-    selection = conf.frame_select
-    while(servoX.getAngle() != conf.servoX_pos and servoY.getAngle() != conf.servoY_pos):
-        if(servoX.getAngle() > conf.servoX_pos):
-            sleep(0.01)
-            servoX.setAngle(servoX.getAngle() - conf.step)
-        if(servoX.getAngle() < conf.servoX_pos):
-            sleep(0.01)
-            servoX.setAngle(servoX.getAngle() + conf.step)
-        if(servoY.getAngle() > conf.servoY_pos):
-            sleep(0.01)
-            servoY.setAngle(servoY.getAngle() - conf.step)
-        if(servoY.getAngle() < conf.servoY_pos):
-            sleep(0.01)
-            servoY.setAngle(servoY.getAngle() + conf.step)
-    
-    print("reset servo")
-
 image_draw = None
+area = HEIGHT_OF_IMAGE * WIDTH_OF_IMAGE
+cent_last = False
+saved_pic = 0
+
+servoX.setAngle(SERVOX_POS)
+servoY.setAngle(SERVOY_POS)
+
+if(UPLOAD):
+    rmtree(PATH_PIC_PC) 
+    mkdir(PATH_PIC_PC)
+
+def save_picture():
+    global saved_pic
+    global current_time
+    global index
+    sleep(2)
+    if(not saved_pic):
+        print("saving pic")
+        print(f"{cX}, {cY}")
+        path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PC)
+        print(path) 
+        saved_pic = 1
 
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
-servoX.setAngle(conf.servoX_pos)
-servoY.setAngle(conf.servoY_pos)
-while True:
-    #print("centered: ")
-    #print(orig)
-    currAngleX = servoX.getAngle()
-    currAngleY = servoY.getAngle()
-    _, frameOrig = cap.read()
 
+while True:
+    _, frameOrig = cap.read()
     if(type(frameOrig) == type(None)):
         pass
-    else:
-        blurred, height, width = cfu.prep_pic(frameOrig)
-        
-        mask_obj = cfu.obj_mask(blurred, conf.green)
-  
-    try:
-        contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
+    else:	
+        img_hsv, img_bw, image_draw = cfu.prep_pic(frameOrig)
+        mask_obj = cv.inRange(img_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
+        mask_line = cfu.crop_img_line_color(img_bw, selection)
+        cv.rectangle(image_draw, (CENTER_X - CENTER_TOLERANCE, CENTER_Y - CENTER_TOLERANCE), (CENTER_X + CENTER_TOLERANCE, CENTER_Y + CENTER_TOLERANCE), (0, 0, 255), 2) 
+        cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (255,255,255), 3)
+        cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (255,255,255), 3)
 
-        for contour_ID, contour in enumerate(contours):
+    try:
+            contours, hierarchy = cv.findContours(mask_obj, cv.RETR_EXTERNAL ,cv.CHAIN_APPROX_NONE)
+            contour = max(contours, key = cv.contourArea)
+            x,y,w,h = cv.boundingRect(contour)
             M = cv.moments(contour)
-            if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                string = str(cX) + " " + str(cY) + " " + contour_ID
-                x,y,w,h = cv.boundingRect(contour)
-                if(w > conf.width/20) and (h > conf.height/20):
-                    obj_in_line = False
+
+            if(w > WIDTH_OF_IMAGE/8) and (h > HEIGHT_OF_IMAGE/8) and (cv.contourArea(contour) > area/150) :
+
+                if(M["m10"] !=0 and M["m01"] !=0 and M["m00"] !=0):
+                    cX = int(M["m10"] / M["m00"])
+                    cY = int(M["m01"] / M["m00"])
+                    string = str(cX) + " " + str(cY)
                     color = (255, 0, 255)
-                    if(y>= 0.66 * conf.height-5 and y<= 0.66 * conf.height+5):
+
+                    if(cY>= SEEK_OBJECT * HEIGHT_OF_IMAGE-30 and cY<= SEEK_OBJECT * HEIGHT_OF_IMAGE+30):
                         color = (255, 255, 0)
                         obj_in_line = True
-                        curr_cont = (cX, cY)                            
+                        curr_cont = (cX, cY)
+                                                    
                     else:
                         prev_obj_in_line = False
-                    cv.rectangle(blurred, (x,y), (x+w,y+h), color, 5)
-                    cv.putText(blurred, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255) )
-    
+
+                    cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
+                    cv.putText(image_draw, string, (x, y-10), cv.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255))
+            else:
+                print("no obj in frame")
+                cent_last = 0
     except Exception as e:
-        print("cannot find object")
-
+             contours = []
+             
     if(obj_in_line == True and prev_obj_in_line == False):
-         
-        orig = cfu.check_orig(curr_cont, last_cont)
         prev_obj_in_line = True
-        print("in line")
-        print(last_cont)
-        print(curr_cont)
-    
-    if(orig):
-        #print("orig, centering")
-        if(save_last):
-            last_cont = (cX, cY)
-            save_last = False
-            print("saved last cont")
-        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY, currAngleX, currAngleY)
-    if (centered and orig):
-                servoX.setAngle(angleX)
-                servoY.setAngle(angleY)
-                sleep(0.5)
-                path, index = cfu.save_pic(index, frameOrig, conf.path_pic_Pi)
-                sleep(0.5)
-                print(path)                    
-
-                res_servo(servoX, servoY)
-                obj_in_line = False
-                centered = False
-                orig = False
-                save_last = True
-                
+        
+    if(obj_in_line):
+        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
             
-    cv.rectangle(blurred, (conf.centerX - conf.tol, conf.centerY - conf.tol), (conf.centerX + conf.tol, conf.centerY + conf.tol), (0, 0, 255), 2) 
+    if(centered and not cent_last):
+        timer = threading.Timer(2.0, save_picture)
+        timer.start()
+        servoX.reset(servoX, SERVOX_POS) 
+        servoY.reset(servoY, SERVOY_POS)
+        saved_pic = 0
+        cent_last = 1
+
+    #show feed
     try:
-         cv.imshow("main", blurred)
-         cv.imshow("mask", mask_obj)
+        #cv.imshow("orig", frameOrig)
+        cv.imshow("draw", image_draw)
     except Exception as e:
         print(str(e))
     if cv.waitKey(1) == ord('q'):
         break
-
 cap.release()
 cv.destroyAllWindows()
-

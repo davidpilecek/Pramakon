@@ -32,6 +32,7 @@ centered = False
 angleX = 0
 angleY = 0
 image_draw = None
+
 area = HEIGHT_OF_IMAGE * WIDTH_OF_IMAGE
 #run in case driving track is lost
 def search_seq(servoX, servoY, dire):
@@ -58,8 +59,8 @@ if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 if(UPLOAD):
-    rmtree(r'~/Pramakon/unclassified_pics') 
-    mkdir(r'~/Pramakon/unclassified_pics')
+    rmtree(PATH_PIC_PC) 
+    mkdir(PATH_PIC_PC)
 
 #main loop where all of the magic happens
 while True:
