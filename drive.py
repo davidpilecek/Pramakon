@@ -1,6 +1,6 @@
 from time import sleep
 import sys
-sys.path.append('/home/pi/Documents/pigpiomaster')
+sys.path.append('/home/pi/pigpio-master')
 from config import *
 import pigpio
 
