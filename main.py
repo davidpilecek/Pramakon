@@ -78,18 +78,7 @@ def save_picture():
         path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PI)
         print(path)
         SAVED_PIC = 1
-        print("resetting")
-        curr = round(servoX.getAngle())
-
-#        if(curr > SERVOX_POS):
- #           for j in range(curr-SERVOX_POS):
-  #              servoX.setAngle(curr - j)
-   #             sleep(0.02)
-    #    else:
-     #       for i in range(abs(curr-SERVOX_POS)):
-      #          servoX.setAngle(curr + i)
-       #         sleep(0.02)
-        print("reset")
+        servoX.setAngle(SERVOX_POS)
         servoY.setAngle(SERVOY_POS)
         CENT_LAST = False
     DO_DRIVE = True

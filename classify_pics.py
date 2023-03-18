@@ -5,9 +5,10 @@ import os
 import csv
 import pathlib
 warnings.filterwarnings("ignore", category=UserWarning)
-#DEFINICE PROMENNYCH A CEST K ULOZISTIM
+#DEFININTION OF MODEL CLASSES
 species = 'sage', 'nettle'
 
+#choose device you're working on
 #device = 'rpi'
 device = 'pc'
 
@@ -19,9 +20,9 @@ if device == "rpi":
      pathlib.WindowsPath = pathlib.PosixPath
 
 elif device == "pc":
-     path_csv = r'C:\Users\david\Desktop\leaf_classifier\results.csv'
-     path_to_predict = r'C:\Users\david\Desktop\leaf_classifier\unclassified_pics'
-     path = r'C:\Users\david\Desktop\leaf_classifier\data'
+     path_csv = r'C:\Users\david\Documents\Pramakon\results.csv'
+     path_to_predict = r'C:\Users\david\Documents\Pramakon\pics'
+     path = r'C:\Users\david\Documents\Pramakon\data'
      path_model = r'C:\Users\david\Documents\Pramakon\fastai_model.pkl'
      temp = pathlib.PosixPath
      pathlib.PosixPath = pathlib.WindowsPath
@@ -34,11 +35,12 @@ def predict(path_to_predict = path_to_predict):
     for i in range(0, num_of_pics):
         path_img = f"{path_to_predict}/img{i}.jpg"
         class_obj,_,probs = learn.predict(PILImage.create(path_img))
+        print(f"img{i}: {class_obj}")
         results.append(class_obj)
         results.append(float(f"{max(probs):.4f}"))
     return results
 
-#ZPRACOVANI VYSLEDKU DO CSV SOUBORU
+#CREATING CSV FILE FROM RESULTS
 def create_csv(results):
     num_of_cells = int(len(results))
     num_of_kopr = results.count("nettle")

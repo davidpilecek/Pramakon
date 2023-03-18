@@ -1,10 +1,18 @@
-Rostlina: ,Jistota odhadu:
-sage,1.0
-sage,0.9988
-nettle,0.8319
-nettle,0.8782
+Plant: ,Confidence:
+sage,100.0 %
+sage,99.88 %
+nettle,83.19 %
+nettle,87.82 %
+nettle,89.3 %
+nettle,97.32 %
+sage,99.81 %
+sage,87.41 %
+sage,97.27 %
+nettle,71.89999999999999 %
+sage,99.92999999999999 %
+sage,99.71 %
 ------------------------------------
-Rostlina:,Celkovy pocet:
-Kopriva:,0
-Salvej:,0
-Prumerna jistota:,0.927
+Plant:,Total count:
+Nettle:,5
+Sage:,7
+Average confidence:,92.80000000000001 %

@@ -16,8 +16,6 @@ FRAME_SELECT= 60
 #point of frame at which we seek the presence of object
 SEEK_OBJECT = 0.5
 
-TIME_DELAY = 2
-
 #PWM values
 PWM_MIN = 40
 PWM_MAX = 60
