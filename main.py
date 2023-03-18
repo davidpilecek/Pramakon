@@ -79,7 +79,16 @@ def save_picture():
         print(path)
         SAVED_PIC = 1
         print("resetting")
-        servoX.reset(servoX, SERVOX_POS)
+        curr = round(servoX.getAngle())
+
+        if(curr > SERVOX_POS):
+            for j in range(curr-SERVOX_POS):
+                servoX.setAngle(curr - j)
+                sleep(0.02)
+        else:
+            for i in range(abs(curr-SERVOX_POS)):
+                servoX.setAngle(curr + i)
+                sleep(0.02)
         print("reset")
         servoY.setAngle(SERVOY_POS)
         CENT_LAST = False
@@ -168,7 +177,6 @@ while True:
                 MAY_STOP = True
     except Exception as e:
              contours = []
-
 
     if(OBJ_IN_LINE and not PREV_OBJ_IN_LINE and MAY_STOP):
         TRY_LINE = False
