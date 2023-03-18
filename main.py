@@ -44,6 +44,7 @@ CENTERED = False
 DO_AIM = True
 TRY_LINE = True
 LINE_FOUND = True
+MAY_STOP = True
 
 #funkce pro vyhledani trate v pripade ztraty
 def search_seq(servoX, servoY, dire):
@@ -66,7 +67,8 @@ def save_picture():
     global servoX
     global servoY
     global CENT_LAST
-    sleep(2)
+    global DO_DRIVE
+    global TRY_LINE
     print("checking if saved")
     if(SAVED_PIC):
         print("alr saved")
@@ -76,10 +78,13 @@ def save_picture():
         path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PI)
         print(path)
         SAVED_PIC = 1
-        servoX.setAngle(SERVOX_POS)
+        print("resetting")
+        servoX.reset(servoX, SERVOX_POS)
+        print("reset")
         servoY.setAngle(SERVOY_POS)
         CENT_LAST = False
-
+    DO_DRIVE = True
+    TRY_LINE = True
 #vychozi nastaveni servomotoru
 servoX.setAngle(SERVOX_POS)
 servoY.setAngle(SERVOY_POS)
@@ -146,9 +151,8 @@ while True:
                         color = (255, 255, 0)
                         OBJ_IN_LINE = True
                         curr_cont = (cX, cY)
-                             
                     else:
-                        OBJ_IN_LINE = False
+#                       OBJ_IN_LINE = False
                         PREV_OBJ_IN_LINE = False
 
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)
@@ -161,17 +165,18 @@ while True:
                 PREV_OBJ_IN_LINE = False
                 CENTERED = False
                 CENT_LAST = False
-
+                MAY_STOP = True
     except Exception as e:
              contours = []
-             print(f"no object contour")
 
-    if(OBJ_IN_LINE and not PREV_OBJ_IN_LINE):
+
+    if(OBJ_IN_LINE and not PREV_OBJ_IN_LINE and MAY_STOP):
         TRY_LINE = False
         PREV_OBJ_IN_LINE = True
         robot.stop()
         DO_DRIVE = False
-        
+        MAY_STOP = False
+
     if(OBJ_IN_LINE and DO_AIM):
         CENTERED, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
 
@@ -180,11 +185,9 @@ while True:
                 CENT_LAST = True
                 timer = threading.Timer(2.0, save_picture)
                 timer.start()
-               # DO_DRIVE = True                    
-               # TRY_LINE = True
 
     _, dire = cfu.deviation(angle)
-    
+ 
     #degree evaluation by PID controller
     dev = round(2*abs(pid(angle)))
     #driving decisions

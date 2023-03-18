@@ -97,7 +97,7 @@ while True:
                         obj_in_line = True
                         curr_cont = (cX, cY) 
                     else:
-                        obj_in_line = False
+#                        obj_in_line = False
                         prev_obj_in_line = False
 
                     cv.rectangle(image_draw, (x,y), (x+w,y+h), color, 5)

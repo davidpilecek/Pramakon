@@ -57,29 +57,24 @@ class Servo():
         self.currAngle = (self.currDutyCycle / 1000 - 1) * 180
         currAngle = self.currAngle
         return currAngle
-    def reset(self, servo_pos):
+    def reset(self,servo, servo_pos):
         self.servo_pos = servo_pos
-        self.curr = round(self.getAngle())
+        self.servo = servo
+        self.curr = round(servo.getAngle())
 
         if(self.curr > self.servo_pos):
             for j in range(self.curr-self.servo_pos):
-                self.setAngle(self.curr - j)
+                servo.setAngle(self.curr - j)
                 sleep(0.02)
         else:
             for i in range(abs(self.curr-self.servo_pos)):
-                self.setAngle(self.curr + i)
+                servo.setAngle(self.curr + i)
                 sleep(0.02)
 
     def stopServo(self):
         self.pi.set_servo_pulsewidth(self.servoPin, 0)
 
 if __name__ == "__main__":
-         robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
-         robot.straight(40)
-         sleep(1)
-         robot.stop()
-         
-        
-         
-
-         
+         servoX = Servo(X_SERVO_PIN)
+         servoX.reset(servoX, SERVOX_POS)
+#         servoX.setAngle(120)
