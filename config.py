@@ -14,7 +14,7 @@ KD=0.12
 #percentage of frame for finding track
 FRAME_SELECT= 60
 #point of frame at which we seek the presence of object
-SEEK_OBJECT = 0.6
+SEEK_OBJECT = 0.5
 
 TIME_DELAY = 2
 
@@ -31,7 +31,7 @@ CENTER_Y = round(HEIGHT_OF_IMAGE / 2)
 CENTER_X = round(WIDTH_OF_IMAGE / 2)
 CENTER_TOLERANCE = 30
 
-PATH_PIC_PI = r"/home/pi/Pramakon/pics/img"
+PATH_PIC_PI = r"/home/pi/Pramakon/pics"
 PATH_PIC_PC = r"C:\Users\david\Documents\Pramakon\pics"
 
 BLUE_HSV_RANGE = np.array([[95,55,35], [135,255,255]])

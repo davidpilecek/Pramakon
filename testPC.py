@@ -7,7 +7,7 @@ from shutil import rmtree
 from os import mkdir
 import threading
 #capture webcam feed
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(0)
 #variables
 dire = 0
 angle = 0
@@ -31,8 +31,8 @@ last_time = 0
 cent_last = False
 
 if(UPLOAD):
-    rmtree(PATH_PIC_PC) 
-    mkdir(PATH_PIC_PC)
+    rmtree(PATH_PIC_PI) 
+    mkdir(PATH_PIC_PI)
 
 def save_picture():
     global saved_pic
@@ -42,7 +42,7 @@ def save_picture():
     if(not saved_pic):
         print("saving pic")
         print(f"{cX}, {cY}")
-        path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PC)
+        path, index = cfu.save_pic(index, frameOrig, PATH_PIC_PI)
         print(path) 
         saved_pic = 1
 

@@ -93,7 +93,7 @@ def steer(basePwm, dev, way, robot):
 
 def save_pic(index, image, path_pic):
     """Alway use original image as argument"""
-    path = f"{path_pic}\img{str(index)}.jpg"
+    path = f"{path_pic}/img{str(index)}.jpg"
     cv.imwrite(path, image)
     index += 1    
     return path, index
@@ -129,7 +129,6 @@ def contours_obj(img_draw, mask):
 def aim_camera_obj(servoX, servoY, obj_x, obj_y):
     currAngleX = servoX.getAngle()
     currAngleY = servoY.getAngle()
-    print("aiming")
     sleep(0.1)
     cent_x = False
     cent_y = False

@@ -59,8 +59,8 @@ if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 if(UPLOAD):
-    rmtree(PATH_PIC_PC) 
-    mkdir(PATH_PIC_PC)
+    rmtree(PATH_PIC_PI) 
+    mkdir(PATH_PIC_PI)
 
 #main loop where all of the magic happens
 while True:
