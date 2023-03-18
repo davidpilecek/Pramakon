@@ -1,12 +1,12 @@
 from time import sleep
-from time import time
 import cv2 as cv
 import camera_func as cfu
 from config import *
+from drive import *
 from shutil import rmtree
 from os import mkdir
 import threading
-from drive import *
+
 
 robot = Robot(LEFT_MOTOR_PIN, RIGHT_MOTOR_PIN)
 servoX = Servo(X_SERVO_PIN)
@@ -14,8 +14,6 @@ servoY = Servo(Y_SERVO_PIN)
 
 servoX.setAngle(SERVOX_POS)
 servoY.setAngle(SERVOY_POS)
-#servoX.stopServo()
-#servoY.stopServo()
 cap = cv.VideoCapture(0)
 
 #variables
@@ -67,10 +65,6 @@ if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 while True:
-    #print(f"do_aim:{do_aim}")
-    #print(f"in_line:{obj_in_line}")
-    #print(f"saved pic: {saved_pic}")
-    #print(servoX.getAngle())
     _, frameOrig = cap.read()
 
     if(type(frameOrig) == type(None)):
@@ -145,5 +139,3 @@ cap.release()
 cv.destroyAllWindows()
 servoX.reset(servoX, SERVOX_POS)
 servoY.reset(servoY, SERVOY_POS)
-#servoX.stopServo()
-#servoY.stopServo()
