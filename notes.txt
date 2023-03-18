@@ -4,7 +4,4 @@ lower Y = 0.6*250 + 30 = 180
 center: +-30 = 95, 155
 //////////////////////////////////////////////////////////
 TODO:
-
-FIGURE OUT WHERE TO PUT DO_DRIVE AND TRY_LINE VARIABLES
-
-comment code
+dat do tabulky results
