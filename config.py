@@ -33,7 +33,7 @@ PATH_PIC_PI = r"/home/pi/Pramakon/pics"
 PATH_PIC_PC = r"C:\Users\david\Documents\Pramakon\pics"
 
 BLUE_HSV_RANGE = np.array([[95,55,35], [135,255,255]])
-GREEN_HSV_RANGE = np.array([[35, 50, 50], [90, 255, 255]])
+GREEN_HSV_RANGE = np.array([40, 50, 50], [80, 255, 255]])
 
 
 ANGLE_TOLERANCE = 10
