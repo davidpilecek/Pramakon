@@ -70,15 +70,16 @@ while True:
     #print(f"do_aim:{do_aim}")
     #print(f"in_line:{obj_in_line}")
     #print(f"saved pic: {saved_pic}")
-#    print(servoX.getAngle())
+    #print(servoX.getAngle())
     _, frameOrig = cap.read()
-    
+
     if(type(frameOrig) == type(None)):
         pass
     else:
         img_hsv, img_bw, image_draw = cfu.prep_pic(frameOrig)
         mask_obj = cv.inRange(img_hsv, GREEN_HSV_RANGE[0], GREEN_HSV_RANGE[1])
         mask_line = cfu.crop_img_line_color(img_bw, selection)
+
         cv.rectangle(image_draw, (CENTER_X - CENTER_TOLERANCE, CENTER_Y - CENTER_TOLERANCE), (CENTER_X + CENTER_TOLERANCE, CENTER_Y + CENTER_TOLERANCE), (0, 0, 255), 2) 
         cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE-30)), (255,255,255), 3)
         cv.line(image_draw, (0,int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (WIDTH_OF_IMAGE, int(SEEK_OBJECT * HEIGHT_OF_IMAGE+30)), (255,255,255), 3)
@@ -124,8 +125,7 @@ while True:
 
     if(obj_in_line and do_aim):
        print(f"cX {cX}")
-       print(f"cY {cY}")
-       #print(f"cX {cX}") 
+       print(f"cY {cY}") 
        centered, angleX, angleY = cfu.aim_camera_obj(servoX, servoY, cX, cY)
 
     if(centered and not cent_last):
